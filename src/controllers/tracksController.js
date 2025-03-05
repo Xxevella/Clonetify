@@ -1,11 +1,10 @@
-import Track from "../models/trackModel.js";
 import tracksService from "../services/trackService.js";
 
 class tracksController {
     async create(req, res) {
         try {
             console.log(req.files);
-            const track = await tracksService.create(req.body, req.file.picture);
+            const track = await tracksService.create(req.body, req.files.picture);
             res.status(201).json(track);
         } catch (error) {
             console.error('Error adding track:', error);

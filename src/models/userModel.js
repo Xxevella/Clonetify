@@ -1,5 +1,5 @@
-import {DataTypes} from 'sequelize'
-import sequelize from './sequelize';
+import { DataTypes } from 'sequelize';
+import sequelize from '../api/sequelize.js';
 
 const User = sequelize.define('User', {
     id: {
@@ -9,6 +9,7 @@ const User = sequelize.define('User', {
     },
     role:{
         type: DataTypes.STRING,
+        defaultValue: "user",
         allowNull: false,
     },
     email: {

@@ -1,5 +1,6 @@
 import bell_icon from './bell.png'
 import home_icon from './home.png'
+import google_icon from './google.png'
 import like_icon from './like.png'
 import loop_icon from './loop.png'
 import mic_icon from './mic.png'
@@ -66,7 +67,8 @@ export const assets = {
     arrow_left,
     arrow_right,
     spotify_logo,
-    clock_icon
+    clock_icon,
+    google_icon
 }
 
 export const albumsData = [

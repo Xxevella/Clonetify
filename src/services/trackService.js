@@ -4,8 +4,8 @@ import FileService from "./fileService.js";
 
 class TrackService {
     async create(track, picture) {
-        const fileName = fileService.saveFile(picture)
-        const createdTrack = await Track.create({...track});
+        const fileName = fileService.saveFile(picture);
+        const createdTrack = await Track.create({ ...track, picture: fileName });
         return createdTrack;
     }
 

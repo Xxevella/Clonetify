@@ -4,14 +4,14 @@ import TracksController from "../../controllers/tracksController.js";
 const router = new Router();
 const tracksController = new TracksController();
 
-router.get('/tracks', tracksController.getAll.bind(tracksController));
+router.get('/tracks', tracksController.getAll);
 
-router.get('/tracks/:id', tracksController.getOne.bind(tracksController));
+router.get('/tracks/:id', tracksController.getOne);
 
-router.post('/tracks', tracksController.create.bind(tracksController));
+router.post('/tracks', tracksController.create);
 
-router.delete('/tracks/:id',tracksController.delete.bind(tracksController));
+router.delete('/tracks/:id',tracksController.delete);
 
-router.put('/tracks', tracksController.update.bind(tracksController));
+router.put('/tracks', tracksController.update);
 
 export default router;

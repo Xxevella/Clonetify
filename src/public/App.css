@@ -1,1 +1,4 @@
 @import "tailwindcss";
+@theme {
+    --color-homeColor: #243c5a;
+}
