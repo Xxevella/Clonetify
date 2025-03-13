@@ -1,6 +1,9 @@
+import dotenv from 'dotenv';
 import { Sequelize } from 'sequelize';
 
-const sequelize = new Sequelize(process.env.REACT_APP_DATABASE_NAME, process.env.REACT_APP_DATABASE_USERNAME, process.env.REACT_APP_DATABASE_PASSWORD, {
+dotenv.config();
+
+const sequelize = new Sequelize(process.env.DATABASE_NAME, process.env.DATABASE_USERNAME, String(process.env.DATABASE_PASSWORD), {
     host: 'localhost',
     dialect: 'postgres',
 });

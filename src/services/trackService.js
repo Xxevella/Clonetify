@@ -1,10 +1,10 @@
 import Track from "../models/trackModel.js";
 import fileService from "./fileService.js";
-import FileService from "./fileService.js";
+
 
 class TrackService {
     async create(track, picture) {
-        const fileName = fileService.saveFile(picture);
+        const fileName = fileService.saveFile(picture, "tracks");
         const createdTrack = await Track.create({ ...track, picture: fileName });
         return createdTrack;
     }

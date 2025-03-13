@@ -1,23 +1,17 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../api/sequelize.js';
 
-const User = sequelize.define('User', {
+const Playlist = sequelize.define('Playlist', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
     },
-    role: {
-        type: DataTypes.STRING,
-        defaultValue: "user",
+    user_id: {
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-    },
-    username: {
+    name: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -32,10 +26,14 @@ const User = sequelize.define('User', {
         allowNull: false,
         defaultValue: DataTypes.NOW,
         field: 'updated_at',
+    },
+    picture:{
+        type: DataTypes.STRING,
+        allowNull: true,
+        field: 'picture',
     }
 }, {
-    tableName: 'users',
+    tableName: 'playlists',
     timestamps: true,
 });
-
-export default User;
+export default Playlist;

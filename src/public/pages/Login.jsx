@@ -1,7 +1,15 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { assets } from "../assets/assets.js";
+import {auth} from "../../firebaseConfig.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
 const Login = () => {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleSignUp = () => {}
+
+
     return (
         <div className='bg-gradient-to-b from-gray-700 to-black min-h-screen grid place-items-center text-white'>
             <div className='bg-gray-900 h-200 w-140 p-6 rounded-lg flex flex-col items-center'>
@@ -18,6 +26,21 @@ const Login = () => {
                     alt="Google Icon"/>
                     <p className='pl-8 font-medium'>Login in with Google</p>
                 </button>
+                <input
+                    type="email"
+                    placeholder='name@domain.com'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-70 h-11 mt-3 pl-3 border-1 border-gray-500 rounded-sm"
+                />
+                <input
+                    type="password"
+                    placeholder='password'
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-70 h-11 mt-3 pl-3 border-1 border-gray-500 rounded-sm"
+                />
+                <button className='w-70 h-11 mt-5 bg-green-600 rounded-4xl text-black font-medium cursor-pointer'>Sign Up</button>
             </div>
         </div>
     );

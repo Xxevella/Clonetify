@@ -11,7 +11,7 @@ const Track = sequelize.define('Track', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    album: {
+    album_id: {
         type: DataTypes.STRING,
     },
     duration: {
@@ -25,16 +25,14 @@ const Track = sequelize.define('Track', {
     createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
+        allowNull: false,
         field: 'created_at',
     },
     updatedAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
+        allowNull: false,
         field: 'updated_at',
-    },
-    genre_id: {
-        type: DataTypes.INTEGER,
-        field: 'genre_id',
     },
     picture:{
         type: DataTypes.STRING,
