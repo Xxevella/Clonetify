@@ -1,65 +1,133 @@
-import tracksService from "../services/trackService.js";
+// controllers/trackController.js
+import trackService from '../services/trackService.js';
 
-class tracksController {
-    async create(req, res) {
+class TrackController {
+    async create(req, res, next) {
         try {
-            console.log(req.files);
-            const track = await tracksService.create(req.body, req.files.picture);
-            res.status(201).json(track);
+            const { title, duration, releaseDate, album_id, artist_ids, genre_ids } = req.body;
+            const { picture } = req.files || {};
+
+            const trackData = { title, duration, releaseDate };
+            const track = await trackService.create(
+                trackData,
+                picture,
+                JSON.parse(artist_ids || '[]'),
+                JSON.parse(genre_ids || '[]'),
+                album_id
+            );
+
+            return res.json(track);
         } catch (error) {
-            console.error('Error adding track:', error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            next(error);
         }
     }
 
-    async getAll(req, res) {
+    async getAll(req, res, next) {
         try {
-            const tracks = await tracksService.getAll();
-            return res.status(200).json(tracks)
-        } catch (error) {
-            console.error('Error getting tracks:', error);
-            res.status(500).json({ error: 'Internal Server Error' });
-        }
-    }
+            const { genre, artist, album, limit, page } = req.query;
+            const options = {};
 
-    async getOne(req, res) {
-        try {
-            const track = await tracksService.getOne(req.params.id);
-            if (!track) return res.status(404).json({ message: 'Track not found' });
-            return res.status(200).json(track);
-        } catch (error) {
-            console.error('Error getting track:', error);
-            res.status(500).json({ error: 'Internal Server Error' });
-        }
-    }
-
-    async update(req, res) {
-        try {
-            const track = req.body;
-            if (!track.id) {
-                return res.status(400).json({ message: 'Type correct id' });
+            // Пагинация
+            if (limit && page) {
+                options.limit = parseInt(limit);
+                options.offset = (parseInt(page) - 1) * parseInt(limit);
             }
-            const updatedTrack = await tracksService.update(track);
-            res.status(200).json(updatedTrack);
+
+            options.where = {};
+            options.include = [];
+
+            const tracks = await trackService.getAll(options);
+            return res.json(tracks);
         } catch (error) {
-            console.error('Error updating track:', error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            next(error);
         }
     }
 
-    async delete(req, res) {
+    async getOne(req, res, next) {
         try {
             const { id } = req.params;
-            if (!id) {
-                return res.status(400).json({ message: 'Track ID is required' });
-            }
-            await tracksService.delete(id);
-            return res.status(200).json({ message: 'Track deleted successfully' });
+            const track = await trackService.getById(id);
+            return res.json(track);
         } catch (error) {
-            console.error('Error deleting track:', error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            next(error);
+        }
+    }
+
+    async update(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { title, duration, release_date, album_id, artist_ids, genre_ids } = req.body;
+            const { picture } = req.files || {};
+
+            const trackData = { title, duration, release_date };
+            const track = await trackService.update(
+                id,
+                trackData,
+                picture,
+                artist_ids ? JSON.parse(artist_ids) : undefined,
+                genre_ids ? JSON.parse(genre_ids) : undefined,
+                album_id
+            );
+
+            return res.json(track);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async delete(req, res, next) {
+        try {
+            const { id } = req.params;
+            const deletedId = await trackService.delete(id);
+            return res.json({ id: deletedId });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async addToPlaylist(req, res, next) {
+        try {
+            const { trackId, playlistId } = req.body;
+            const result = await trackService.addToPlaylist(trackId, playlistId);
+            return res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async removeFromPlaylist(req, res, next) {
+        try {
+            const { trackId, playlistId } = req.body;
+            const result = await trackService.removeFromPlaylist(trackId, playlistId);
+            return res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async addToFavorites(req, res, next) {
+        try {
+            const { trackId } = req.body;
+            const userId = req.user.id;
+
+            const result = await trackService.addToFavorites(trackId, userId);
+            return res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async removeFromFavorites(req, res, next) {
+        try {
+            const { trackId } = req.body;
+            const userId = req.user.id;
+
+            const result = await trackService.removeFromFavorites(trackId, userId);
+            return res.json(result);
+        } catch (error) {
+            next(error);
         }
     }
 }
 
-export default tracksController;
+export default new TrackController();

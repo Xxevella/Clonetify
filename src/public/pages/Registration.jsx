@@ -1,34 +1,59 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import { setUser } from '../../redux/slices/userSlice.js';
 import { auth } from '../../firebaseConfig.js';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, deleteUser} from 'firebase/auth';
 import { assets } from "../assets/assets.js";
+import {useNavigate} from "react-router-dom";
 
 const Registration = () => {
     const dispatch = useDispatch();
+    const isAuthenticated = useSelector((state)=>state.user.isAuthenticated);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
+    const navigate = useNavigate();
 
     const handleSignUp = async () => {
+        let user;
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
+            user = userCredential.user;
+
+            await updateProfile(user,{displayName:username})
+
             const newUser = {
                 id: user.uid,
                 email: user.email,
-                username: username,
+                username,
+                role: 'user',
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
             };
-
+            await saveUserDB(newUser);
             dispatch(setUser(newUser));
             console.log(newUser);
+            alert('Created Successfully!');
         } catch (error) {
+            if (user) {
+                await deleteUser(user).catch(e => console.error("Error deleting user:", e));
+            }
             console.error("Error registering user:", error);
         }
     };
+
+    const saveUserDB = async (user) => {
+        try {
+            await fetch('http://localhost:5000/userRouter/users',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user)})
+        }catch (error) {
+            console.error("Error saving user:", error);
+        }
+    }
 
     return (
         <div className='bg-gradient-to-b from-gray-700 to-black min-h-screen grid place-items-center text-white'>
@@ -68,7 +93,7 @@ const Registration = () => {
                     className="w-70 h-11 mt-3 pl-3 border-1 border-gray-500 rounded-sm"
                 />
                 <button
-                    onClick={handleSignUp} // Добавляем обработчик нажатия
+                    onClick={handleSignUp}
                     className='w-70 h-11 mt-5 bg-green-600 rounded-4xl text-black font-medium cursor-pointer'>
                     Sign Up
                 </button>

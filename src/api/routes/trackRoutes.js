@@ -1,17 +1,19 @@
-import Router from 'express';
-import TracksController from "../../controllers/tracksController.js";
+// routes/trackRoutes.js
+import { Router } from 'express';
+import trackController from '../../controllers/tracksController.js';
 
-const router = new Router();
-const tracksController = new TracksController();
+const router = Router();
 
-router.get('/tracks', tracksController.getAll);
+router.post('/tracks', trackController.create.bind(trackController));
+router.get('/tracks', trackController.getAll.bind(trackController));
+router.get('/tracks/:id', trackController.getOne.bind(trackController));
+router.put('/tracks/:id', trackController.update.bind(trackController));
+router.delete('/:id',  trackController.delete.bind(trackController));
 
-router.get('/tracks/:id', tracksController.getOne);
+router.post('/playlist', trackController.addToPlaylist);
+router.delete('/playlist', trackController.removeFromPlaylist);
 
-router.post('/tracks', tracksController.create);
-
-router.delete('/tracks/:id',tracksController.delete);
-
-router.put('/tracks', tracksController.update);
+router.post('/favorites', trackController.addToFavorites);
+router.delete('/favorites', trackController.removeFromFavorites);
 
 export default router;

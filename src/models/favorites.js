@@ -1,34 +1,27 @@
 import sequelize from '../api/sequelize.js';
 import {DataTypes} from "sequelize";
 
-const Album = sequelize.define('Album', {
+const Favorites = sequelize.define('Favorites', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
     },
-    title: {
+    user_id: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    release_date:{
-        type: DataTypes.STRING,
+    track_id: {
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
-    createdAt: {
+    added_at:{
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
-        field: 'created_at',
-    },
-    updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-        field: 'updated_at',
-    },
+    }
 }, {
-    tableName: 'albums',
+    tableName: 'favorites',
     timestamps: true,
 });
-export default Album;
+export default Favorites;

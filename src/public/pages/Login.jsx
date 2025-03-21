@@ -2,12 +2,51 @@ import React, {useState} from 'react';
 import { assets } from "../assets/assets.js";
 import {auth} from "../../firebaseConfig.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import {setUser} from "../../redux/slices/userSlice.js";
+import {useDispatch} from "react-redux";
+import {useNavigate} from "react-router-dom";
 
 const Login = () => {
+    const dispatch = useDispatch();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
-    const handleSignUp = () => {}
+    const handleSignIn = async () => {
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            const role = await fetchUserRole(user.uid);
+
+            dispatch(setUser({
+                id: user.uid,
+                email: user.email,
+                username: user.displayName || '',
+                role: role,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            }));
+            navigate('/');
+            alert("Sign in Successfully!");
+        }
+        catch (error) {
+            console.error("Error signing in:", error);
+            alert("Invalid data");
+        }
+    }
+
+    const fetchUserRole = async (uid) => {
+        try {
+            const response = await fetch(`http://localhost:5000/userRouter/users/${uid}`);
+            const data = await response.json();
+            console.log(data);
+            return data.role;
+        }catch (error) {
+            console.error("Error fetching user role:", error);
+            return null;
+        }
+    }
 
 
     return (
@@ -40,7 +79,10 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-70 h-11 mt-3 pl-3 border-1 border-gray-500 rounded-sm"
                 />
-                <button className='w-70 h-11 mt-5 bg-green-600 rounded-4xl text-black font-medium cursor-pointer'>Sign Up</button>
+                <button
+                    className='w-70 h-11 mt-5 bg-green-600 rounded-4xl text-black font-medium cursor-pointer'
+                    onClick={handleSignIn}
+                >Sign In</button>
             </div>
         </div>
     );

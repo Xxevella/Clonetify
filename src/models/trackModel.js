@@ -11,9 +11,6 @@ const Track = sequelize.define('Track', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    album_id: {
-        type: DataTypes.STRING,
-    },
     duration: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -37,7 +34,11 @@ const Track = sequelize.define('Track', {
     picture:{
         type: DataTypes.STRING,
         field: 'picture',
-    }
+    },
+    album_id: {
+        type: DataTypes.STRING,
+    },
+
 },{
     tableName: 'tracks',
     timestamps: true,

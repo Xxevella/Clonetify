@@ -1,5 +1,5 @@
-import { DataTypes } from 'sequelize';
 import sequelize from '../api/sequelize.js';
+import {DataTypes} from "sequelize";
 
 const Artist = sequelize.define('Artist', {
     id: {
@@ -24,7 +24,7 @@ const Artist = sequelize.define('Artist', {
         field: 'updated_at',
     },
     user_id:{
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true,
     }

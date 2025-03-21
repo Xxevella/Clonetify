@@ -2,6 +2,7 @@ import User from "../models/userModel.js";
 
 class UserService{
     async create(user) {
+        console.log(user);
         const createdUser = await User.create(user)
         return createdUser;
     }
