@@ -1,7 +1,6 @@
 import fileService from "./fileService.js";
 import { models } from '../models/index.js';
-
-const { User, Playlist } = models;
+const { User, Playlist, Track, Playlist_tracks } = models;
 
 class PlaylistService {
     async create(playlist, picture, userId) {
@@ -23,13 +22,32 @@ class PlaylistService {
     }
 
     async getAll() {
-        const playlists = await Playlist.findAll();
+        const playlists = await Playlist.findAll({
+            include: [
+                {
+                    model: Track,
+                    through: {
+                        model: Playlist_tracks,
+                        attributes: ['added_at'], // Указываем только нужное поле
+                    },
+                    required: false
+                }
+            ]
+        });
         return playlists;
     }
 
     async getOne(id) {
         if (!id) throw new Error("No id");
-        const playlist = await Playlist.findByPk(id);
+        const playlist = await Playlist.findByPk(id, {
+            include: [
+                {
+                    model: Track,
+                    through: Playlist_tracks,
+                    required: false
+                }
+            ]
+        });
         return playlist;
     }
 

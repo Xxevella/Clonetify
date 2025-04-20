@@ -6,7 +6,7 @@ const userSlice = createSlice({
         id: null,
         email: null,
         username: null,
-        role: null,
+        role: "guest",
         createdAt: null,
         updatedAt: null,
         isAuthenticated: false,
@@ -32,6 +32,12 @@ const userSlice = createSlice({
             state.isAuthenticated = false;
         },
         logout: (state) => {
+            state.id = null;
+            state.email = null;
+            state.username = null;
+            state.role = "guest";
+            state.createdAt = null;
+            state.updatedAt = null;
             state.isAuthenticated = false;
         }
     },

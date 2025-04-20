@@ -1,5 +1,5 @@
 import sequelize from '../api/sequelize.js';
-import {DataTypes} from "sequelize";
+import { DataTypes } from "sequelize";
 
 const Playlist_tracks = sequelize.define('Playlist_tracks', {
     id: {
@@ -15,13 +15,16 @@ const Playlist_tracks = sequelize.define('Playlist_tracks', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    added_at:{
+    added_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
     }
 }, {
     tableName: 'playlist_tracks',
-    timestamps: true,
+    timestamps: true, // Включите временные метки
+    createdAt: false,  // Отключите createdAt
+    updatedAt: false,  // Отключите updatedAt
 });
+
 export default Playlist_tracks;

@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { assets } from "../assets/assets.js";
-import {auth} from "../../firebaseConfig.js";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import {setUser} from "../../redux/slices/userSlice.js";
-import {useDispatch} from "react-redux";
-import {useNavigate} from "react-router-dom";
+import { auth } from "../../firebaseConfig.js";
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { setUser } from "../../redux/slices/userSlice.js";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -12,42 +13,28 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
+
     const handleSignIn = async () => {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            const role = await fetchUserRole(user.uid);
-
-            dispatch(setUser({
+            const userData = {
                 id: user.uid,
                 email: user.email,
                 username: user.displayName || '',
-                role: role,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-            }));
+            };
+
+            Cookies.set('user', JSON.stringify(userData), { expires: 7 });
+
+            dispatch(setUser(userData));
             navigate('/');
             alert("Sign in Successfully!");
-        }
-        catch (error) {
+        } catch (error) {
             console.error("Error signing in:", error);
             alert("Invalid data");
         }
-    }
-
-    const fetchUserRole = async (uid) => {
-        try {
-            const response = await fetch(`http://localhost:5000/userRouter/users/${uid}`);
-            const data = await response.json();
-            console.log(data);
-            return data.role;
-        }catch (error) {
-            console.error("Error fetching user role:", error);
-            return null;
-        }
-    }
-
+    };
 
     return (
         <div className='bg-gradient-to-b from-gray-700 to-black min-h-screen grid place-items-center text-white'>
@@ -60,9 +47,10 @@ const Login = () => {
                 <h2 className='text-xl font-bold'>Login to Clonetify</h2>
                 <button className='w-70 h-11 border-1 border-gray-500 mt-9 rounded-3xl flex items-center cursor-pointer hover:border-white'>
                     <img
-                    className='w-6 ml-7'
-                    src={assets.google_icon}
-                    alt="Google Icon"/>
+                        className='w-6 ml-7'
+                        src={assets.google_icon}
+                        alt="Google Icon"
+                    />
                     <p className='pl-8 font-medium'>Login in with Google</p>
                 </button>
                 <input
