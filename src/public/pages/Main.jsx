@@ -14,8 +14,14 @@ const Main = () => {
     const [error, setError] = useState(null);
     const [recommendations, setRecommendations] = useState([]);
 
+    const tabs = [
+        { title: 'Liked Songs', image: assets.search_icon, count: 131, icon: assets.likedSongs},
+        { title: 'Rain Sounds', image: assets.search_icon, count: 50, icon: assets.likedSongs},
+        { title: 'Blurryface', image: assets.search_icon, count: 20, icon: assets.likedSongs},
+    ];
+
     useEffect(() => {
-        const storedUser = Cookies.get('auth'); // Измените 'user' на 'auth'
+        const storedUser = Cookies.get('auth');
         if (storedUser) {
             const user = JSON.parse(storedUser);
             dispatch(setUser(user));
@@ -44,6 +50,7 @@ const Main = () => {
             })
             .then((data) => {
                 setUserState(data);
+                Cookies.set('auth', JSON.stringify(data));
                 setLoading(false);
             })
             .catch((error) => {
@@ -84,7 +91,26 @@ const Main = () => {
         return recommendations.map((playlist) => (
             <div key={playlist.id} className="p-4 bg-gray-800 rounded-lg mb-4">
                 <h2 className="text-white text-lg">{playlist.name}</h2>
-                <p className="text-gray-400">{`Playlist • ${playlist.count} songs`}</p>
+                <p className="text-gray-400">{`Playlist • ${playlist.Tracks.length} songs`}</p>
+                <div className="mt-2 flex flex-wrap">
+                    {playlist.Tracks.map((track) => (
+                        <div key={track.id} className="flex flex-col items-center p-2 bg-gray-700 rounded mb-2 w-50 h-60 ml-10 cursor-pointer">
+                            <img
+                                src={'../../../tracksPic/' + track.picture}
+                                alt={track.title}
+                                className="w-40 h-40 rounded mb-2"
+                            />
+                            <h3 className="text-white">{track.title}</h3>
+                            <div className="text-gray-400">
+                                {track.Artists && track.Artists.length > 0
+                                    ? track.Artists.map((artist) => (
+                                        <span key={artist.id}>{artist.name}{', '}</span>
+                                    ))
+                                    : 'Unknown Artist'}
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         ));
     };
@@ -111,12 +137,6 @@ const Main = () => {
         }
     };
 
-    const tabs = [
-        { title: 'Liked Songs', image: assets.search_icon, count: 131 },
-        { title: 'Rain Sounds', image: assets.search_icon, count: 50 },
-        { title: 'Blurryface', image: assets.search_icon, count: 20 },
-    ];
-
     return (
         <div className="h-screen bg-gradient-to-b from-gray-700 to-black flex">
             <div className="w-1/5 bg-black p-4">
@@ -131,7 +151,7 @@ const Main = () => {
                                     className={`flex flex-row items-center p-4 rounded-lg transition-colors cursor-pointer ${selectedTab === tab.title ? 'bg-gray-700 text-white' : 'bg-gray-900 text-gray-400'}`}
                                     onClick={() => dispatch(selectTab(tab.title))}
                                 >
-                                    <img src={tab.image} alt={tab.title} className="w-10 h-10 mr-4" />
+                                    <img src={tab.icon} alt={tab.title} className="w-10 h-10 mr-4" />
                                     <div>
                                         <h2 className="text-lg">{tab.title}</h2>
                                         <p className="text-sm">{`Playlist • ${tab.count} songs`}</p>

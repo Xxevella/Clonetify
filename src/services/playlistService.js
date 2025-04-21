@@ -1,5 +1,7 @@
 import fileService from "./fileService.js";
 import { models } from '../models/index.js';
+import Artist from "../models/artistModel.js";
+import Track_artists from "../models/track_artists.js";
 const { User, Playlist, Track, Playlist_tracks } = models;
 
 class PlaylistService {
@@ -28,10 +30,20 @@ class PlaylistService {
                     model: Track,
                     through: {
                         model: Playlist_tracks,
-                        attributes: ['added_at'], // Указываем только нужное поле
+                        attributes: ['added_at'],
                     },
+                    include: [
+                        {
+                            model: Artist,
+                            through: {
+                                model: Track_artists,
+                                attributes: []
+                            },
+                            required: false
+                        }
+                    ],
                     required: false
-                }
+                },
             ]
         });
         return playlists;
@@ -44,12 +56,23 @@ class PlaylistService {
                 {
                     model: Track,
                     through: Playlist_tracks,
+                    include: [
+                        {
+                            model: Artist,
+                            through: {
+                                model: Track_artists,
+                                attributes: []
+                            },
+                            required: false
+                        }
+                    ],
                     required: false
                 }
             ]
         });
         return playlist;
     }
+
 
     async update(playlist) {
         const existingPlaylist = await Playlist.findByPk(playlist.id);
