@@ -30,17 +30,17 @@ class UserController{
             return res.status(500).json({ message: 'Error getting user' });
         }
     }
-    async update(req,res){
+    async update(req, res) {
         try {
             const user = req.body;
-            if(!await UserService.getOne(user.id)){
+            const existingUser = await UserService.getOne(user.id);
+            if (!existingUser) {
                 return res.status(404).json({ message: 'No user found with this id' });
             }
             const updatedUser = await UserService.update(user);
             return res.status(200).json(updatedUser);
-        }
-        catch (error) {
-            res.status(500).json({message: 'Error updating user'});
+        } catch (error) {
+            res.status(500).json({ message: 'Error updating user' });
         }
     }
     async delete(req,res){

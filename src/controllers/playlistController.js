@@ -12,16 +12,16 @@ class PlaylistController{
         }
     }
 
-    async getAll(req, res) {
+    async getClonetifyRecs(req, res) {
+        const userId = 'XrPwvcFtFdfkgh9PCLDK7b96CcJ2'; //****
         try {
-            const playlists = await PlaylistService.getAll();
+            const playlists = await PlaylistService.getAll(userId);
             return res.status(200).json(playlists);
         } catch (error) {
             console.error('Error getting playlists:', error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     }
-
     async getOne(req, res) {
         try {
             const playlist = await PlaylistService.getOne(req.params.id);

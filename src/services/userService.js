@@ -16,9 +16,11 @@ class UserService{
         return foundUser;
     }
     async update(user) {
-        const existingUser = await User.findByPk(user.id)
-        if(!existingUser){throw new Error("User does not exist")}
-        await existingUser.update(user)
+        const existingUser = await User.findByPk(user.id);
+        if (!existingUser) {
+            throw new Error("User does not exist");
+        }
+        await existingUser.update(user);
         return existingUser;
     }
 

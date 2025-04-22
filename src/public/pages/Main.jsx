@@ -62,7 +62,7 @@ const Main = () => {
 
     useEffect(() => {
         if (!selectedTab) {
-            fetch('http://localhost:5000/playlistRouter/playlists')
+            fetch('http://localhost:5000/playlistRouter/recs')
                 .then((res) => {
                     if (!res.ok) {
                         throw new Error('Failed to fetch playlists');

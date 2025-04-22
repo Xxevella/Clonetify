@@ -23,8 +23,9 @@ class PlaylistService {
         throw new Error('User not found');
     }
 
-    async getAll() {
+    async getAll(userId) {
         const playlists = await Playlist.findAll({
+            where: { user_id: userId }, // Фильтр по user_id
             include: [
                 {
                     model: Track,

@@ -39,9 +39,12 @@ const userSlice = createSlice({
             state.createdAt = null;
             state.updatedAt = null;
             state.isAuthenticated = false;
-        }
+        },
+        updateUserEmail: (state, action) => {
+            state.email = action.payload;
+        },
     },
 });
 
-export const { setUser, clearUser, logout } = userSlice.actions;
+export const { setUser, clearUser, logout, updateUserEmail } = userSlice.actions;
 export default userSlice.reducer;

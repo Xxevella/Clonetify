@@ -49,17 +49,30 @@ const Navbar = () => {
                             className='w-12 h-12 rounded-full overflow-hidden border-2 cursor-pointer bg-gray-800 flex items-center justify-center'
                             onClick={toggleMenu}
                         >
-                            <img src={user.avatar || assets.search_icon} alt='User Avatar' className='w-7 h-7 object-cover' />
+                            {user.role === 'admin' && (
+                                <img src={assets.adminIcon} alt='Admin Avatar' className='w-7 h-7 object-cover' />
+                            )}
+                            {user.role === 'artist' && (
+                                <img src={assets.artistIcon} alt='Artist Avatar' className='w-7 h-7 object-cover' />
+                            )}
+                            {user.role === 'user' && (
+                                <img src={assets.userIcon} alt='User Avatar' className='w-7 h-7 object-cover' />
+                            )}
                         </div>
                         {menuOpen && (
                             <div className="absolute right-0 bg-white text-black rounded shadow-md mt-2">
                                 <Link to="/profile" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setMenuOpen(false)}>
                                     Profile
                                 </Link>
+                                {user.role === 'admin' && (
+                                    <Link to="/admin-panel" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setMenuOpen(false)}>
+                                        Admin Panel
+                                    </Link>
+                                )}
                                 <div
                                     className="block px-4 py-2 hover:bg-gray-200 cursor-pointer"
                                     onClick={() => {
-                                        handleLogout(dispatch);
+                                        handleLogout(dispatch, navigate);
                                         setMenuOpen(false);
                                     }}
                                 >

@@ -34,6 +34,7 @@ const Registration = () => {
             dispatch(setUser(newUser));
             console.log(newUser);
             alert('Created Successfully!');
+            navigate('/')
         } catch (error) {
             if (user) {
                 await deleteUser(user).catch(e => console.error("Error deleting user:", e));
