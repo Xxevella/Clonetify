@@ -23,9 +23,38 @@ class PlaylistService {
         throw new Error('User not found');
     }
 
+    async getOne(id) {
+        const playlist = await Playlist.findOne({
+            where: { user_id: id },  // Изменено с id на user_id
+            include: [
+                {
+                    model: Track,
+                    through: {
+                        model: Playlist_tracks,
+                        attributes: ['added_at'],
+                    },
+                    include: [
+                        {
+                            model: Artist,
+                            through: {
+                                model: Track_artists,
+                                attributes: []
+                            },
+                            required: false
+                        }
+                    ],
+                    required: false
+                },
+            ]
+        });
+        return playlist;
+    }
+
     async getAll(userId) {
+        const user = await User.findByPk(userId);
+        if (!user) throw new Error('User not found');
         const playlists = await Playlist.findAll({
-            where: { user_id: userId }, // Фильтр по user_id
+            where: { user_id: userId },
             include: [
                 {
                     model: Track,
@@ -50,30 +79,6 @@ class PlaylistService {
         return playlists;
     }
 
-    async getOne(id) {
-        if (!id) throw new Error("No id");
-        const playlist = await Playlist.findByPk(id, {
-            include: [
-                {
-                    model: Track,
-                    through: Playlist_tracks,
-                    include: [
-                        {
-                            model: Artist,
-                            through: {
-                                model: Track_artists,
-                                attributes: []
-                            },
-                            required: false
-                        }
-                    ],
-                    required: false
-                }
-            ]
-        });
-        return playlist;
-    }
-
 
     async update(playlist) {
         const existingPlaylist = await Playlist.findByPk(playlist.id);
@@ -88,6 +93,7 @@ class PlaylistService {
         await playlist.destroy();
         return playlistId;
     }
+
 }
 
 export default new PlaylistService();

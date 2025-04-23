@@ -33,6 +33,17 @@ class PlaylistController{
         }
     }
 
+    async getPlaylistsByUserId(req, res) {
+        const { userId } = req.params;
+        try {
+            const playlists = await PlaylistService.getAll(userId);
+            return res.status(200).json(playlists);
+        } catch (error) {
+            console.error('Error fetching playlists:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
+
     async update(req, res) {
         try {
             const playlist = req.body;
@@ -60,6 +71,7 @@ class PlaylistController{
             res.status(500).json({ error: 'Internal Server Error' });
         }
     }
+
 }
 
 export default PlaylistController;

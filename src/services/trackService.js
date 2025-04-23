@@ -1,5 +1,6 @@
 import { models } from '../models/index.js';
 import fileService from './fileService.js';
+import Favorites from "../models/favorites.js";
 
 const { Track, Artist, Genres, Track_genres, Track_artists, Album } = models;
 
@@ -198,10 +199,9 @@ class TrackService {
     }
 
     async addToFavorites(trackId, userId) {
-        await models.Favorites.create({
+        await Favorites.create({
             track_id: trackId,
             user_id: userId,
-            added_at: new Date()
         });
 
         return { trackId, userId };
@@ -216,6 +216,28 @@ class TrackService {
         });
 
         return { trackId, userId };
+    }
+    async getFavoritesByUserId(userId) {
+        const favorites = await Favorites.findAll({
+            where: { user_id: userId },
+            include: [
+                {
+                    model: Track,
+                    include: [
+                        {
+                            model: Artist,
+                            attributes: ['id', 'name'],
+                        },
+                        {
+                            model: Genres,
+                            attributes: ['id', 'name'],
+                        }
+                    ],
+                }
+            ],
+        });
+
+        return favorites.map(favorite => favorite.Track);
     }
 }
 

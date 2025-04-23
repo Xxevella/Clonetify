@@ -1,5 +1,5 @@
 import sequelize from '../api/sequelize.js';
-import {DataTypes} from "sequelize";
+import { DataTypes } from "sequelize";
 
 const Favorites = sequelize.define('Favorites', {
     id: {
@@ -15,13 +15,14 @@ const Favorites = sequelize.define('Favorites', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    added_at:{
+    added_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
     }
 }, {
     tableName: 'favorites',
-    timestamps: true,
+    timestamps: false,
 });
+
 export default Favorites;

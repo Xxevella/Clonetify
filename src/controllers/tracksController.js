@@ -43,6 +43,16 @@ class TrackController {
             next(error);
         }
     }
+    async getFavorites(req, res, next) {
+        try {
+            const { userId } = req.params;
+            const favorites = await trackService.getFavoritesByUserId(userId);
+            return res.json(favorites);
+        } catch (error) {
+            console.error('Error fetching favorites:', error);
+            next(error);
+        }
+    }
 
     async update(req, res, next) {
         try {
@@ -82,6 +92,7 @@ class TrackController {
     async addToPlaylist(req, res, next) {
         try {
             const { trackId, playlistId } = req.body;
+            console.log(trackId, playlistId);
             const result = await trackService.addToPlaylist(trackId, playlistId);
             return res.json(result);
         } catch (error) {
@@ -101,12 +112,12 @@ class TrackController {
 
     async addToFavorites(req, res, next) {
         try {
-            const { trackId } = req.body;
-            const userId = req.user.id;
+            const { trackId, userId } = req.body;
 
             const result = await trackService.addToFavorites(trackId, userId);
             return res.json(result);
         } catch (error) {
+            console.error('Error in addToFavorites:', error);
             next(error);
         }
     }
