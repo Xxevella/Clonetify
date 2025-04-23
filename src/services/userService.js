@@ -6,9 +6,23 @@ class UserService{
         const createdUser = await User.create(user)
         return createdUser;
     }
-    async getAll(){
-        const allUsers = await User.findAll();
+    async getAll(page, limit) {
+        const offset = (page - 1) * limit;
+        const allUsers = await User.findAll({
+            limit: limit,
+            offset: offset,
+        });
         return allUsers;
+    }
+
+    async getAllWithoutPagination() {
+        const allUsers = await User.findAll(); // Получаем всех пользователей без пагинации
+        return allUsers;
+    }
+
+    async count() {
+        const total = await User.count();
+        return total;
     }
     async getOne(id){
         if(!id) throw new Error("id is required");

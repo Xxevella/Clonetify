@@ -9,13 +9,22 @@ class UserController{
            res.status(500).json({message: 'Error creating users'});
        }
     }
-    async getAll(req,res){
+    async getAll(req, res) {
         try {
-            const users = await UserService.getAll();
-            return res.status(200).json(users);
-        }
-        catch (error) {
-            res.status(500).json({message: 'Error getting users'});
+            const page = parseInt(req.query.page);
+            const limit = parseInt(req.query.limit);
+
+            if (!page || !limit) {
+                const users = await UserService.getAllWithoutPagination();
+                return res.status(200).json({ users, total: users.length });
+            }
+
+            const users = await UserService.getAll(page, limit);
+            const total = await UserService.count();
+
+            return res.status(200).json({ users, total });
+        } catch (error) {
+            res.status(500).json({ message: 'Error getting users' });
         }
     }
 

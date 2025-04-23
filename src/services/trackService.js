@@ -1,17 +1,18 @@
-
 import { models } from '../models/index.js';
 import fileService from './fileService.js';
 
 const { Track, Artist, Genres, Track_genres, Track_artists, Album } = models;
 
 class TrackService {
-    async create(trackData, picture, artistIds, genreIds, albumId) {
+    async create(trackData, picture, audio, artistIds, genreIds, albumId) {
         try {
-            const fileName = picture ? fileService.saveFile(picture) : null;
-            console.log('Track data:', trackData);
+            const pictureFileName = picture ? fileService.saveImage(picture) : null;
+            const audioFileName = audio ? fileService.saveAudio(audio) : null;
+
             const track = await Track.create({
                 ...trackData,
-                picture: fileName,
+                picture: pictureFileName,
+                audio: audioFileName,
                 album_id: albumId
             });
 
@@ -32,11 +33,10 @@ class TrackService {
             }
 
             return track;
+        } catch (error) {
+            console.error('Error creating track:', error);
+            throw error;
         }
-     catch (error) {
-        console.error('Error creating track:', error);
-        throw error;
-    }
     }
 
     async getAll(options = {}) {
@@ -44,17 +44,24 @@ class TrackService {
             include: [
                 {
                     model: Album,
-                    attributes: ['id', 'title']
+                    attributes: ['id', 'title'],
+                    required: false,
                 },
                 {
                     model: Artist,
-                    through: { attributes: [] },
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'name'],
+                    through: {
+                        model: Track_artists,
+                        attributes: []
+                    },
                 },
                 {
                     model: Genres,
-                    through: { attributes: [] },
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'name'],
+                    through: {
+                        model: Track_genres,
+                        attributes: []
+                    },
                 }
             ],
             ...options
@@ -70,17 +77,18 @@ class TrackService {
             include: [
                 {
                     model: Album,
-                    attributes: ['id', 'title']
+                    attributes: ['id', 'title'],
+                    required: false,
                 },
                 {
                     model: Artist,
                     through: { attributes: [] },
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'name'],
                 },
                 {
                     model: Genres,
                     through: { attributes: [] },
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'name'],
                 }
             ]
         });
@@ -89,14 +97,33 @@ class TrackService {
         return track;
     }
 
-    async update(id, trackData, picture, artistIds, genreIds, albumId) {
+    async update(id, trackData, picture, audio, artistIds, genreIds, albumId) {
         const track = await Track.findByPk(id);
         if (!track) throw new Error("Track not found");
 
-        const fileName = picture ? fileService.saveFile(picture) : track.picture;
+        let pictureFileName = track.picture;
+        let audioFileName = track.audio;
+
+        if (picture) {
+            // Delete old picture file if it exists
+            if (track.picture) {
+                fileService.deleteFile(track.picture, 'image');
+            }
+            pictureFileName = fileService.saveImage(picture);
+        }
+
+        if (audio) {
+            // Delete old audio file if it exists
+            if (track.audio) {
+                fileService.deleteFile(track.audio, 'audio');
+            }
+            audioFileName = fileService.saveAudio(audio);
+        }
+
         await track.update({
             ...trackData,
-            picture: fileName,
+            picture: pictureFileName,
+            audio: audioFileName,
             album_id: albumId
         });
 
@@ -130,11 +157,18 @@ class TrackService {
         const track = await Track.findByPk(id);
         if (!track) throw new Error("Track not found");
 
+        // Delete associated files
+        if (track.picture) {
+            fileService.deleteFile(track.picture, 'image');
+        }
+        if (track.audio) {
+            fileService.deleteFile(track.audio, 'audio');
+        }
+
         await Track_artists.destroy({ where: { track_id: id } });
         await Track_genres.destroy({ where: { track_id: id } });
 
         await models.Favorites.destroy({ where: { track_id: id } });
-
         await models.Playlist_tracks.destroy({ where: { track_id: id } });
 
         await track.destroy();

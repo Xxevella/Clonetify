@@ -1,16 +1,18 @@
-// controllers/trackController.js
 import trackService from '../services/trackService.js';
 
 class TrackController {
     async create(req, res, next) {
         try {
-            const { title, duration, releaseDate, album_id, artist_ids, genre_ids } = req.body;
-            const { picture } = req.files || {};
+            const { title,releaseDate, album_id, artist_ids, genre_ids } = req.body;
+            const files = req.files || {};
+            const picture = files.picture;
+            const audio = files.audio;
 
-            const trackData = { title, duration, releaseDate };
+            const trackData = { title,releaseDate };
             const track = await trackService.create(
                 trackData,
                 picture,
+                audio,
                 JSON.parse(artist_ids || '[]'),
                 JSON.parse(genre_ids || '[]'),
                 album_id
@@ -22,24 +24,13 @@ class TrackController {
         }
     }
 
-    async getAll(req, res, next) {
+    async getAll(req, res) {
         try {
-            const { genre, artist, album, limit, page } = req.query;
-            const options = {};
-
-            // Пагинация
-            if (limit && page) {
-                options.limit = parseInt(limit);
-                options.offset = (parseInt(page) - 1) * parseInt(limit);
-            }
-
-            options.where = {};
-            options.include = [];
-
-            const tracks = await trackService.getAll(options);
+            const tracks = await trackService.getAll();
             return res.json(tracks);
         } catch (error) {
-            next(error);
+            console.error(error);
+            return res.status(500).json({ message: "Internal server error" });
         }
     }
 
@@ -56,14 +47,17 @@ class TrackController {
     async update(req, res, next) {
         try {
             const { id } = req.params;
-            const { title, duration, release_date, album_id, artist_ids, genre_ids } = req.body;
-            const { picture } = req.files || {};
+            const { title, releaseDate, album_id, artist_ids, genre_ids } = req.body;
+            const files = req.files || {};
+            const picture = files.picture;
+            const audio = files.audio;
 
-            const trackData = { title, duration, release_date };
+            const trackData = { title, releaseDate };
             const track = await trackService.update(
                 id,
                 trackData,
                 picture,
+                audio,
                 artist_ids ? JSON.parse(artist_ids) : undefined,
                 genre_ids ? JSON.parse(genre_ids) : undefined,
                 album_id

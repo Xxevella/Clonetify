@@ -40,6 +40,7 @@ const Registration = () => {
                 await deleteUser(user).catch(e => console.error("Error deleting user:", e));
             }
             console.error("Error registering user:", error);
+            alert('Error creating user: ' + error.message);
         }
     };
 

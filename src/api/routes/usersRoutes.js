@@ -1,6 +1,7 @@
 import Router from "express";
 import UserController from "../../controllers/userController.js";
 import authMiddleware from "../../middlewares/authMiddleware.js";
+import admin from 'firebase-admin';
 
 const router = new Router();
 const userController = new UserController(router);

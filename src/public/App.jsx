@@ -6,6 +6,8 @@ import Main from "./pages/Main.jsx";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Profile from "./pages/Profile.jsx";
 import AdminPanel from "./pages/AdminPanel.jsx";
+import AddAdminPanel from "./pages/AddAdminPanel.jsx";
+import UpdateUserPanel from "./pages/UpdateUserPanel.jsx";
 
 function App() {
     return (
@@ -21,6 +23,8 @@ function App() {
                 <Route path="/registration" element={<Registration />} />
                 <Route path="/profile" element={<Profile/>} />
                 <Route path="/admin-panel" element={<AdminPanel/>} />
+                <Route path="/add-admin-panel" element={<AddAdminPanel/>} />
+                <Route path="/update-user/:id" element={<UpdateUserPanel />} />
             </Routes>
         </Router>
     );

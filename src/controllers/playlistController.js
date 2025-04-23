@@ -13,7 +13,7 @@ class PlaylistController{
     }
 
     async getClonetifyRecs(req, res) {
-        const userId = 'XrPwvcFtFdfkgh9PCLDK7b96CcJ2'; //****
+        const userId = process.env.ADMIN_ID; //****
         try {
             const playlists = await PlaylistService.getAll(userId);
             return res.status(200).json(playlists);
