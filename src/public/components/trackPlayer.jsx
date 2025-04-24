@@ -67,7 +67,11 @@ const TrackPlayer = ({
     return (
         <div className="track-player bg-gray-800 p-4 flex items-center justify-between fixed bottom-0 left-0 right-0">
             <div className="flex items-center relative">
-                <img src={"../../../static/images/" + track.picture} alt={track.title} className="w-16 h-16 rounded" />
+                <img
+                    src={track ? `../../../static/images/${track.picture}` : '../../../tracksPic/008345a8-f134-4f40-9f44-ef2af931da79.png'}
+                    alt={track ? track.title : 'No track selected'}
+                    className="w-16 h-16 rounded"
+                />
                 <div className="ml-4 flex items-center relative">
                     <h2 className="text-white text-lg">{track.title}</h2>
                     <img

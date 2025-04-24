@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Cookies from "js-cookie";
 import { setUser } from "../../redux/slices/userSlice.js";
 import { selectTab } from "../../redux/slices/tabSlice.js";
-import { setTracks } from "../../redux/slices/tracksSlice.js";
+import {setCurrentTrack, setTracks} from "../../redux/slices/tracksSlice.js";
 import TrackPlayer from '../components/trackPlayer.jsx';
 import { assets } from "../assets/assets.js";
 
@@ -18,22 +18,20 @@ const Main = () => {
     const [error, setError] = useState(null);
     const [recommendations, setRecommendations] = useState([]);
     const [randomTracks, setRandomTracks] = useState([]);
-    const [currentTrack, setCurrentTrack] = useState(null);
+    const currentTrack = useSelector(state => state.tracks.currentTrack);
     const [isPlaying, setIsPlaying] = useState(false);
     const [volume, setVolume] = useState(50);
     const audioRef = React.useRef(new Audio());
     const [currentTime, setCurrentTime] = useState(0);
 
-    // Новое состояние для favorites и playlists
     const [favorites, setFavorites] = useState([]);
     const [playlists, setPlaylists] = useState([]);
 
-    // Формируем динамические вкладки: Favorites + плейлисты
     const tabs = [
         { title: 'Favorites', icon: assets.likedSongs, count: favorites.length },
         ...playlists.map(pl => ({
             title: pl.name,
-            icon: assets.likedSongs, // можно заменить на иконку из плейлиста, если есть
+            icon: assets.likedSongs,
             count: pl.Tracks ? pl.Tracks.length : 0
         }))
     ];
@@ -181,7 +179,6 @@ const Main = () => {
             const data = await response.json();
             console.log(`Track ${track.title} added to favorites:`, data);
 
-            // Обновляем favorites после добавления
             fetchFavorites();
         } catch (error) {
             console.error('Error adding to favorites:', error);
@@ -230,8 +227,8 @@ const Main = () => {
         audioRef.current.src = `../../../static/audio/${track.audio}`;
         audioRef.current.onloadedmetadata = () => {
             const duration = audioRef.current.duration;
-            setCurrentTrack({ ...track, duration });
-            Cookies.set('currentTrack', JSON.stringify({ ...track, duration }));
+            dispatch(setCurrentTrack({ ...track, duration }));
+            Cookies.set('currentTrack', JSON.stringify({ ...track, duration }), { path: '/', expires: 7 });
             audioRef.current.play();
             setIsPlaying(true);
         };
@@ -252,7 +249,6 @@ const Main = () => {
         return <div className="text-red-500">{error}</div>;
     }
 
-    // Рендерим содержимое вкладки
     const renderContent = () => {
         if (selectedTab) {
             if (selectedTab === 'Favorites') {
@@ -289,7 +285,6 @@ const Main = () => {
                 );
             }
 
-            // Поиск плейлиста по имени и показ его треков
             const playlist = playlists.find(pl => pl.name === selectedTab);
             if (playlist) {
                 return (
@@ -418,22 +413,24 @@ const Main = () => {
             <div className="w-4/5 overflow-y-auto p-4 flex flex-col pb-60">
                 {renderContent()}
             </div>
-            <TrackPlayer
-                track={currentTrack}
-                onPlay={handlePlay}
-                onPause={handlePause}
-                onNext={() => {}}
-                onPrevious={() => {}}
-                currentTime={currentTime}
-                duration={currentTrack?.duration}
-                onVolumeChange={handleVolumeChange}
-                volume={volume}
-                onSeek={handleSeek}
-                isPlaying={isPlaying}
-                playlists={playlists}
-                onAddToPlaylist={handleAddToPlaylist}
-                onAddToFavorites={handleAddToFavorites}
-            />
+            {currentTrack && (
+                <TrackPlayer
+                    track={currentTrack}
+                    onPlay={handlePlay}
+                    onPause={handlePause}
+                    onNext={() => {}}
+                    onPrevious={() => {}}
+                    currentTime={currentTime}
+                    duration={currentTrack.duration}
+                    onVolumeChange={handleVolumeChange}
+                    volume={volume}
+                    onSeek={handleSeek}
+                    isPlaying={isPlaying}
+                    playlists={playlists}
+                    onAddToPlaylist={handleAddToPlaylist}
+                    onAddToFavorites={handleAddToFavorites}
+                />
+            )}
         </div>
     );
 };

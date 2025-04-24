@@ -19,15 +19,22 @@ const Login = () => {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
+            // Запрос на твой backend за полными данными пользователя
+            const res = await fetch(`http://localhost:5000/userRouter/users/${user.uid}`);
+            if (!res.ok) throw new Error('Failed to fetch user data');
+            const userDataFromServer = await res.json();
+
             const userData = {
-                id: user.uid,
-                email: user.email,
-                username: user.displayName || '',
+                id: userDataFromServer.id,
+                email: userDataFromServer.email,
+                username: userDataFromServer.username,
+                role: userDataFromServer.role,
             };
 
-            Cookies.set('user', JSON.stringify(userData), { expires: 7 });
+            Cookies.set('auth', JSON.stringify(userData), { path: '/', expires: 7 });
 
             dispatch(setUser(userData));
+
             navigate('/');
             alert("Sign in Successfully!");
         } catch (error) {
