@@ -1,5 +1,5 @@
 import PlaylistService from "../services/playlistService.js";
-
+import fileService from "../services/fileService.js";
 class PlaylistController{
     async create(req, res) {
         try {
@@ -11,11 +11,20 @@ class PlaylistController{
             res.status(500).json({ error: 'Internal Server Error' });
         }
     }
+    async getAll(req, res) {
+        try {
+            const playlists = await PlaylistService.getAll();
+            return res.status(200).json(playlists);
+        } catch (error) {
+            console.error('Error getting playlists:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
 
     async getClonetifyRecs(req, res) {
-        const userId = process.env.ADMIN_ID; //****
+        const userId = process.env.ADMIN_ID;
         try {
-            const playlists = await PlaylistService.getAll(userId);
+            const playlists = await PlaylistService.getAllWithId(userId);
             return res.status(200).json(playlists);
         } catch (error) {
             console.error('Error getting playlists:', error);
@@ -46,11 +55,36 @@ class PlaylistController{
 
     async update(req, res) {
         try {
-            const playlist = req.body;
-            if (!playlist.id) {
+            const playlistId = req.params.id;
+            if (!playlistId) {
                 return res.status(400).json({ message: 'Type correct id' });
             }
-            const updatedPlaylist = await PlaylistService.update(playlist);
+
+            const playlistData = req.body;
+
+            const existingPlaylist = await PlaylistService.getOne(playlistId);
+            if (!existingPlaylist) {
+                return res.status(404).json({ message: 'Playlist not found' });
+            }
+
+            if (req.files && req.files.picture) {
+                const oldFileName = existingPlaylist.picture;
+
+                if (oldFileName) {
+                    fileService.saveFileWithName(req.files.picture, oldFileName, 'image');
+                    playlistData.picture = oldFileName;
+                } else {
+                    const newFileName = fileService.saveFile(req.files.picture, 'image');
+                    playlistData.picture = newFileName;
+                }
+            } else {
+                playlistData.picture = existingPlaylist.picture;
+            }
+
+            playlistData.id = playlistId;
+
+            const updatedPlaylist = await PlaylistService.update(playlistData);
+
             res.status(200).json(updatedPlaylist);
         } catch (error) {
             console.error('Error updating playlist:', error);

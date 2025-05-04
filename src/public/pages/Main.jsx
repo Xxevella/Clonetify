@@ -9,6 +9,7 @@ import { assets } from "../assets/assets.js";
 
 const Main = () => {
     const dispatch = useDispatch();
+    const [searchResults, setSearchResults] = useState([]);
     const selectedTab = useSelector((state) => state.tab.selectedTab);
     const userId = useSelector((state) => state.user.id);
     const tracks = useSelector((state) => state.tracks.tracks);
@@ -40,6 +41,7 @@ const Main = () => {
         const storedUser = Cookies.get('auth');
         const storedVolume = Cookies.get('volume');
         const storedTrack = Cookies.get('currentTrack');
+
 
         if (storedUser) {
             const user = JSON.parse(storedUser);
@@ -383,6 +385,7 @@ const Main = () => {
 
     return (
         <div className="h-screen bg-gradient-to-b from-gray-700 to-black flex">
+
             <div className="w-1/5 bg-black p-4 overflow-y-auto">
                 <h1 className="text-white text-2xl mb-4">Your Library</h1>
                 {user ? (

@@ -3,23 +3,24 @@ import trackService from '../services/trackService.js';
 class TrackController {
     async create(req, res, next) {
         try {
-            const { title,releaseDate, album_id, artist_ids, genre_ids } = req.body;
+            const { title, releaseDate, album_id, artist_ids, genre_ids } = req.body;
             const files = req.files || {};
             const picture = files.picture;
             const audio = files.audio;
 
-            const trackData = { title,releaseDate };
+            // Create track data object including album_id
+            const trackData = { title, releaseDate, album_id }; // Include album_id here
             const track = await trackService.create(
                 trackData,
                 picture,
                 audio,
                 JSON.parse(artist_ids || '[]'),
-                JSON.parse(genre_ids || '[]'),
-                album_id
+                JSON.parse(genre_ids || '[]')
             );
 
-            return res.json(track);
+            return res.status(201).json(track);
         } catch (error) {
+            console.error('Error creating track:', error);
             next(error);
         }
     }

@@ -12,7 +12,7 @@ const Album = sequelize.define('Album', {
         allowNull: false,
     },
     release_date:{
-        type: DataTypes.STRING,
+        type: DataTypes.DATE,
         allowNull: false,
     },
     createdAt: {
@@ -26,6 +26,10 @@ const Album = sequelize.define('Album', {
         allowNull: false,
         defaultValue: DataTypes.NOW,
         field: 'updated_at',
+    },
+    picture: {
+        type: DataTypes.STRING,
+        field: 'picture',
     },
 }, {
     tableName: 'albums',

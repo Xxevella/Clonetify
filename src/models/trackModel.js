@@ -37,6 +37,7 @@ const Track = sequelize.define('Track', {
         },
         album_id: {
             type: DataTypes.STRING,
+            field: 'album_id',
         },
     },{
         tableName: 'tracks',

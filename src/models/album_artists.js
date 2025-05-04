@@ -17,5 +17,6 @@ const Album_artists = sequelize.define('Album_artists', {
     }
 }, {
     tableName: 'album_artists',
+    timestamps: false,
 });
 export default Album_artists;

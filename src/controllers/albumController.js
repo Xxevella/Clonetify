@@ -1,89 +1,128 @@
 import albumService from '../services/albumService.js';
+import fileService from '../services/fileService.js';
 
 class AlbumController {
-    async create(req, res, next) {
+    async create(req, res) {
         try {
-            const { title, release_date, artist_ids, genre_ids } = req.body;
-            const { picture } = req.files || {};
+            console.log('Create album called');
+            console.log('req.body:', req.body);
+            console.log('req.files:', req.files);
 
-            const album = await albumService.create(
-                { title, release_date },
-                picture,
-                JSON.parse(artist_ids || '[]'),
-                JSON.parse(genre_ids || '[]')
-            );
+            const albumData = {
+                ...req.body,
+                release_date: req.body.release_date ? new Date(req.body.release_date) : null
+            };
 
-            return res.json(album);
+            let artistIds = [];
+            let genreIds = [];
+            let trackIds = [];
+
+            try {
+                if (albumData.artistIds) artistIds = JSON.parse(albumData.artistIds);
+                if (albumData.genreIds) genreIds = JSON.parse(albumData.genreIds);
+                if (albumData.trackIds) trackIds = JSON.parse(albumData.trackIds);
+            } catch (e) {
+                return res.status(400).json({ message: 'Invalid artistIds, genreIds or trackIds format' });
+            }
+
+            const pictureFile = req.files && req.files.picture ? req.files.picture : null;
+
+            const album = await albumService.create(albumData, pictureFile, artistIds, genreIds, trackIds);
+
+            return res.status(201).json(album);
         } catch (error) {
-            next(error);
+            console.error('Error creating album:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
         }
     }
 
-    async getAll(req, res, next) {
+    async getAll(req, res) {
         try {
-            const {
-                limit,
-                page,
-                search,
-                genre,
-                artist,
-                sort
-            } = req.query;
-
-            const offset = page ? (parseInt(page) - 1) * parseInt(limit) : 0;
-
-            const albums = await albumService.getAll({
-                limit,
-                offset,
-                search,
-                genre,
-                artist,
-                sort
-            });
-
-            return res.json(albums);
+            const albums = await albumService.getAll();
+            return res.status(200).json(albums);
         } catch (error) {
-            next(error);
+            console.error('Error getting albums:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
         }
     }
 
-    async getOne(req, res, next) {
+    async getOne(req, res) {
         try {
             const { id } = req.params;
-            const album = await albumService.getById(id);
-            return res.json(album);
+            if (!id) return res.status(400).json({ message: 'Album ID required' });
+
+            const album = await albumService.getOne(id);
+            if (!album) return res.status(404).json({ message: 'Album not found' });
+
+            return res.status(200).json(album);
         } catch (error) {
-            next(error);
+            console.error('Error getting album:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
         }
     }
 
-    async update(req, res, next) {
+    async update(req, res) {
         try {
             const { id } = req.params;
-            const { title, release_date, artist_ids, genre_ids } = req.body;
-            const { picture } = req.files || {};
+            if (!id) {
+                return res.status(400).json({ message: 'Album ID required' });
+            }
 
-            const album = await albumService.update(
+            // Проверяем существование альбома
+            const existingAlbum = await albumService.getById(id);
+            if (!existingAlbum) {
+                return res.status(404).json({ message: 'Album not found' });
+            }
+
+            // Получаем данные из FormData
+            const albumData = {
+                title: req.body.title || existingAlbum.title,
+                release_date: req.body.release_date ? new Date(req.body.release_date) : existingAlbum.release_date
+            };
+
+            // Парсим ID из JSON строк
+            let artistIds = [], genreIds = [], trackIds = [];
+
+            try {
+                if (req.body.artistIds) artistIds = JSON.parse(req.body.artistIds);
+                if (req.body.genreIds) genreIds = JSON.parse(req.body.genreIds);
+                if (req.body.trackIds) trackIds = JSON.parse(req.body.trackIds);
+            } catch (error) {
+                console.error('Error parsing IDs:', error);
+                return res.status(400).json({ message: 'Invalid ID format' });
+            }
+
+            // Проверяем наличие файла
+            const picture = req.files && req.files.picture ? req.files.picture : null;
+
+            const updatedAlbum = await albumService.update(
                 id,
-                { title, release_date },
+                albumData,
                 picture,
-                artist_ids ? JSON.parse(artist_ids) : undefined,
-                genre_ids ? JSON.parse(genre_ids) : undefined
+                artistIds,
+                genreIds,
+                trackIds
             );
 
-            return res.json(album);
+            return res.json(updatedAlbum);
         } catch (error) {
-            next(error);
+            console.error('Error updating album:', error);
+            return res.status(500).json({
+                message: error.message || 'Internal Server Error'
+            });
         }
     }
 
-    async delete(req, res, next) {
+    async delete(req, res) {
         try {
             const { id } = req.params;
-            const deletedId = await albumService.delete(id);
-            return res.json({ id: deletedId });
+            if (!id) return res.status(400).json({ message: 'Album ID required' });
+
+            await albumService.delete(id);
+            return res.status(200).json({ message: 'Album deleted successfully' });
         } catch (error) {
-            next(error);
+            console.error('Error deleting album:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
         }
     }
 

@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import UsersAdminPanel from "../components/UsersAdminPanel.jsx";
-import {assets} from "../assets/assets.js";
+import PlaylistsAdminPanel from "../components/PlaylistsAdminPanel.jsx";
+import { assets } from "../assets/assets.js";
+import AlbumsAdminPanel from "../components/AdminPanel/AlbumsAdminPanel.jsx";
+import TracksAdminPanel from "../components/AdminPanel/TracksAdminPanel.jsx";
+import GenresAdminPanel from "../components/AdminPanel/GenresAdminPanel.jsx";
 
 const AdminPanel = () => {
-    const [activeTab, setActiveTab] = useState('users');
+    const [activeTab, setActiveTab] = useState(() => {
+        return localStorage.getItem('adminPanelActiveTab') || 'users';
+    });
     const navigate = useNavigate();
 
+    useEffect(() => {
+        localStorage.setItem('adminPanelActiveTab', activeTab);
+    }, [activeTab]);
+
     return (
-        <div className="p-4 bg-gray-700 h-screen relative">
+        <div className="p-4 bg-gray-700 min-h-screen relative">
             <h1 className="text-2xl mb-4 text-white">Admin Panel</h1>
             <div className="absolute top-4 right-4">
                 <div
@@ -52,10 +62,10 @@ const AdminPanel = () => {
             </div>
             <div className="tab-content text-white">
                 {activeTab === 'users' && <UsersAdminPanel />}
-                {activeTab === 'playlists' && <div>Playlists Tab Content</div>}
-                {activeTab === 'albums' && <div>Albums Tab Content</div>}
-                {activeTab === 'tracks' && <div>Tracks Tab Content</div>}
-                {activeTab === 'genres' && <div>Genres Tab Content</div>}
+                {activeTab === 'playlists' && <PlaylistsAdminPanel />}
+                {activeTab === 'albums' && <AlbumsAdminPanel />}
+                {activeTab === 'tracks' && <TracksAdminPanel />}
+                {activeTab === 'genres' && <GenresAdminPanel/>}
             </div>
         </div>
     );

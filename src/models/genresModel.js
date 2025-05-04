@@ -13,5 +13,6 @@ const Genres = sequelize.define('Genres', {
     },
 }, {
     tableName: 'genres',
+    timestamps: false,
 });
 export default Genres;

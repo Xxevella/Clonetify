@@ -37,6 +37,21 @@ class FileService {
             throw error;
         }
     }
+    saveFileWithName(file, fileName, type = 'image') {
+        if (!file) return null;
+
+        try {
+            const filePath = type === 'image'
+                ? path.join(this.imagePath, fileName)
+                : path.join(this.audioPath, fileName);
+
+            file.mv(filePath);
+            return fileName;
+        } catch (error) {
+            console.error(`Error saving ${type} file:`, error);
+            throw error;
+        }
+    }
 
     saveImage(file) {
         return this.saveFile(file, 'image');
@@ -46,21 +61,35 @@ class FileService {
         return this.saveFile(file, 'audio');
     }
 
-    deleteFile(fileName, type = 'image') {
+    deleteImage(fileName) {
         if (!fileName) return;
 
         try {
-            const filePath = type === 'image'
-                ? path.join(this.imagePath, fileName)
-                : path.join(this.audioPath, fileName);
+            const filePath = path.join(this.imagePath, fileName);
 
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
+                console.log(`Deleted image: ${filePath}`);
             }
         } catch (error) {
-            console.error(`Error deleting ${type} file:`, error);
+            console.error('Error deleting image file:', error);
+        }
+    }
+
+    deleteAudio(fileName) {
+        if (!fileName) return;
+
+        try {
+            const filePath = path.join(this.audioPath, fileName);
+
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+                console.log(`Deleted audio: ${filePath}`);
+            }
+        } catch (error) {
+            console.error('Error deleting audio file:', error);
         }
     }
 }
 
-export default new FileService();
+export default new FileService('../../../static/images/', '../../../static/audio/');

@@ -5,7 +5,7 @@ import Favorites from "../models/favorites.js";
 const { Track, Artist, Genres, Track_genres, Track_artists, Album } = models;
 
 class TrackService {
-    async create(trackData, picture, audio, artistIds, genreIds, albumId) {
+    async create(trackData, picture, audio, artistIds, genreIds) {
         try {
             const pictureFileName = picture ? fileService.saveImage(picture) : null;
             const audioFileName = audio ? fileService.saveAudio(audio) : null;
@@ -14,9 +14,9 @@ class TrackService {
                 ...trackData,
                 picture: pictureFileName,
                 audio: audioFileName,
-                album_id: albumId
             });
 
+            // Add entries to track_artists and track_genres
             if (artistIds && artistIds.length) {
                 const artistRecords = artistIds.map(artistId => ({
                     track_id: track.id,
@@ -36,7 +36,7 @@ class TrackService {
             return track;
         } catch (error) {
             console.error('Error creating track:', error);
-            throw error;
+            throw error; // Ensure this does not call next
         }
     }
 
@@ -158,23 +158,22 @@ class TrackService {
         const track = await Track.findByPk(id);
         if (!track) throw new Error("Track not found");
 
-        // Delete associated files
-        if (track.picture) {
-            fileService.deleteFile(track.picture, 'image');
-        }
-        if (track.audio) {
-            fileService.deleteFile(track.audio, 'audio');
-        }
-
+        // Delete associated entries in track_artists and track_genres
         await Track_artists.destroy({ where: { track_id: id } });
         await Track_genres.destroy({ where: { track_id: id } });
 
-        await models.Favorites.destroy({ where: { track_id: id } });
-        await models.Playlist_tracks.destroy({ where: { track_id: id } });
+        // Optionally delete associated files
+        if (track.picture) {
+            fileService.deleteImage(track.picture);
+        }
+        if (track.audio) {
+            fileService.deleteAudio(track.audio);
+        }
 
+        // Finally, delete the track itself
         await track.destroy();
 
-        return id;
+        return id; // Return the ID of the deleted track
     }
 
     async addToPlaylist(trackId, playlistId) {

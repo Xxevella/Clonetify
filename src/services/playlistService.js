@@ -25,7 +25,7 @@ class PlaylistService {
 
     async getOne(id) {
         const playlist = await Playlist.findOne({
-            where: { user_id: id },  // Изменено с id на user_id
+            where: { id: id },
             include: [
                 {
                     model: Track,
@@ -50,7 +50,32 @@ class PlaylistService {
         return playlist;
     }
 
-    async getAll(userId) {
+    async getAll() {
+        const playlists = await Playlist.findAll({
+            include: [
+                {
+                    model: Track,
+                    through: {
+                        model: Playlist_tracks,
+                        attributes: ['added_at'],
+                    },
+                    include: [
+                        {
+                            model: Artist,
+                            through: {
+                                model: Track_artists,
+                                attributes: []
+                            },
+                            required: false
+                        }
+                    ],
+                    required: false
+                },
+            ]
+        });
+        return playlists;
+    }
+    async getAllWithId(userId) {
         const user = await User.findByPk(userId);
         if (!user) throw new Error('User not found');
         const playlists = await Playlist.findAll({

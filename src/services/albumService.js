@@ -1,15 +1,16 @@
 import { models } from '../models/index.js';
 import fileService from './fileService.js';
 import {Op} from "sequelize";
+import sequelize from "../api/sequelize.js";
 
-const { Album, Artist, Album_artists, Album_genres, Track, Genre } = models;
+const { Album, Artist, Album_artists, Album_genres, Track, Genres } = models;
 
 class AlbumService {
-    async create(albumData, picture, artistIds, genreIds) {
+    async create(albumData, picture, artistIds, genreIds, trackIds) {
         const t = await sequelize.transaction();
 
         try {
-            const fileName = picture ? fileService.saveFile(picture) : null;
+            const fileName = picture ? await fileService.saveFile(picture) : null;
 
             const album = await Album.create({
                 ...albumData,
@@ -32,9 +33,24 @@ class AlbumService {
                 await Album_genres.bulkCreate(genreRecords, { transaction: t });
             }
 
+            if (trackIds?.length) {
+                // Сначала отвязываем все треки от альбома (если нужно)
+                await Track.update(
+                    { album_id: null },
+                    { where: { album_id: album.id }, transaction: t }
+                );
+
+                // Привязываем треки из списка к альбому
+                await Track.update(
+                    { album_id: album.id },
+                    { where: { id: trackIds }, transaction: t }
+                );
+            }
+
             await t.commit();
             return this.getById(album.id);
         } catch (error) {
+            console.error('Error creating album:', error);
             await t.rollback();
             throw error;
         }
@@ -45,20 +61,9 @@ class AlbumService {
 
         const queryOptions = {
             include: [
-                {
-                    model: Artist,
-                    through: { attributes: [] },
-                    attributes: ['id', 'name']
-                },
-                {
-                    model: Genre,
-                    through: { attributes: [] },
-                    attributes: ['id', 'name']
-                },
-                {
-                    model: Track,
-                    attributes: ['id', 'title', 'duration']
-                }
+                { model: Artist, through: { attributes: [] } },
+                { model: Genres, through: { attributes: [] } },
+                { model: Track }
             ],
             where: {},
             order: [['release_date', 'DESC']],
@@ -97,13 +102,13 @@ class AlbumService {
                     attributes: ['id', 'name']
                 },
                 {
-                    model: Genre,
+                    model: Genres,
                     through: { attributes: [] },
                     attributes: ['id', 'name']
                 },
                 {
                     model: Track,
-                    attributes: ['id', 'title', 'duration', 'release_date'],
+                    attributes: ['id', 'title', 'release_date'],
                     include: [
                         {
                             model: Artist,
@@ -119,52 +124,95 @@ class AlbumService {
         return album;
     }
 
-    async update(id, albumData, picture, artistIds, genreIds) {
+    async update(id, albumData, picture, artistIds, genreIds, trackIds) {
         const t = await sequelize.transaction();
 
         try {
             const album = await Album.findByPk(id);
-            if (!album) throw new Error("Album not found");
+            if (!album) {
+                throw new Error("Album not found");
+            }
 
-            const fileName = picture ? fileService.saveFile(picture) : album.picture;
+            // Обработка изображения
+            let fileName = album.picture;
+            if (picture) {
+                // Удаляем старое изображение, если оно существует
+                if (album.picture) {
+                    await fileService.deleteFile(album.picture);
+                }
+                fileName = fileService.saveFile(picture);
+            }
 
-            await album.update({
-                ...albumData,
-                picture: fileName
-            }, { transaction: t });
+            // Обновляем основные данные альбома
+            await album.update(
+                {
+                    ...albumData,
+                    picture: fileName
+                },
+                { transaction: t }
+            );
 
+            // Обновляем связи с артистами
             if (artistIds) {
                 await Album_artists.destroy({
                     where: { album_id: id },
                     transaction: t
                 });
 
-                if (artistIds.length) {
-                    const artistRecords = artistIds.map(artistId => ({
-                        album_id: id,
-                        artist_id: artistId
-                    }));
-                    await Album_artists.bulkCreate(artistRecords, { transaction: t });
+                if (artistIds.length > 0) {
+                    await Album_artists.bulkCreate(
+                        artistIds.map(artistId => ({
+                            album_id: id,
+                            artist_id: artistId
+                        })),
+                        { transaction: t }
+                    );
                 }
             }
 
+            // Обновляем связи с жанрами
             if (genreIds) {
                 await Album_genres.destroy({
                     where: { album_id: id },
                     transaction: t
                 });
 
-                if (genreIds.length) {
-                    const genreRecords = genreIds.map(genreId => ({
-                        album_id: id,
-                        genre_id: genreId
-                    }));
-                    await Album_genres.bulkCreate(genreRecords, { transaction: t });
+                if (genreIds.length > 0) {
+                    await Album_genres.bulkCreate(
+                        genreIds.map(genreId => ({
+                            album_id: id,
+                            genre_id: genreId
+                        })),
+                        { transaction: t }
+                    );
+                }
+            }
+
+            // Обновляем связи с треками
+            if (trackIds) {
+                await Track.update(
+                    { album_id: null },
+                    {
+                        where: { album_id: id },
+                        transaction: t
+                    }
+                );
+
+                if (trackIds.length > 0) {
+                    await Track.update(
+                        { album_id: id },
+                        {
+                            where: { id: trackIds },
+                            transaction: t
+                        }
+                    );
                 }
             }
 
             await t.commit();
-            return this.getById(id);
+
+            // Возвращаем обновленный альбом со всеми связями
+            return await this.getById(id);
         } catch (error) {
             await t.rollback();
             throw error;
