@@ -73,12 +73,11 @@ const AlbumsAdminPanel = () => {
         setSearchTerm(e.target.value);
     };
 
-    // Колбеки при создании и обновлении для локального обновления списка
     const handleCreated = (newAlbum) => {
         setAlbums(prev => {
             const updated = [...prev, newAlbum];
             setFilteredAlbums(updated.filter(al =>
-                al.name.toLowerCase().includes(searchTerm.toLowerCase())
+                al.title.toLowerCase().includes(searchTerm.toLowerCase())
             ));
             return updated;
         });
@@ -89,7 +88,7 @@ const AlbumsAdminPanel = () => {
         setAlbums(prev => {
             const updated = prev.map(al => al.id === updatedAlbum.id ? updatedAlbum : al);
             setFilteredAlbums(updated.filter(al =>
-                al.name.toLowerCase().includes(searchTerm.toLowerCase())
+                al.title.toLowerCase().includes(searchTerm.toLowerCase())
             ));
             return updated;
         });
@@ -134,9 +133,9 @@ const AlbumsAdminPanel = () => {
                     <th className="py-2 px-4 border border-gray-600 text-left">ID</th>
                     <th className="py-2 px-4 border border-gray-600 text-left">Name</th>
                     <th className="py-2 px-4 border border-gray-600 text-left">Picture</th>
-                    <th className="py-2 px-4 border border-gray-600 text-left">User ID</th>
-                    <th className="py-2 px-4 border border-gray-600 text-left">Created At</th>
-                    <th className="py-2 px-4 border border-gray-600 text-left">Updated At</th>
+                    <th className="py-2 px-4 border border-gray-600 text-left">Genres</th>
+                    <th className="py-2 px-4 border border-gray-600 text-left">Artist IDs</th>
+                    <th className="py-2 px-4 border border-gray-600 text-left">Track IDs</th>
                     <th className="py-2 px-4 border border-gray-600 text-left">Actions</th>
                 </tr>
                 </thead>
@@ -146,24 +145,27 @@ const AlbumsAdminPanel = () => {
                     filteredAlbums.map(al => (
                         <tr key={al.id}>
                             <td className="py-2 px-4 border border-gray-600">{al.id}</td>
-                            <td className="py-2 px-4 border border-gray-600">{al.name}</td>
-
+                            <td className="py-2 px-4 border border-gray-600">{al.title}</td>
                             <td className="py-2 px-4 border border-gray-600">
                                 {al.picture ? (
                                     <img
                                         src={`../../../static/images/${al.picture}`}
-                                        alt={al.name}
+                                        alt={al.title}
                                         className="w-12 h-12 object-cover rounded"
                                     />
                                 ) : (
                                     '-'
                                 )}
                             </td>
-
-                            <td className="py-2 px-4 border border-gray-600">{al.user_id}</td>
-
-                            <td className="py-2 px-4 border border-gray-600">{new Date(al.createdAt).toLocaleString()}</td>
-                            <td className="py-2 px-4 border border-gray-600">{new Date(al.updatedAt).toLocaleString()}</td>
+                            <td className="py-2 px-4 border border-gray-600">
+                                {al.Genres && al.Genres.length > 0 ? al.Genres.map(genre => genre.name).join(', ') : '-'}
+                            </td>
+                            <td className="py-2 px-4 border border-gray-600">
+                                {al.Artists && al.Artists.length > 0 ? al.Artists.map(artist => artist.user_id).join(', ') : '-'}
+                            </td>
+                            <td className="py-2 px-4 border border-gray-600">
+                                {al.Tracks && al.Tracks.length > 0 ? al.Tracks.map(track => track.id).join(', ') : '-'}
+                            </td>
                             <td className="py-2 px-4 border border-gray-600">
                                 <button onClick={() => handleUpdateAlbum(al)} className="mx-1 bg-yellow-500 text-white rounded px-2 cursor-pointer">Update</button>
                                 <button onClick={() => handleDeleteAlbum(al.id)} className="mx-1 bg-red-500 text-white rounded px-2 cursor-pointer">Delete</button>
@@ -205,7 +207,6 @@ const AlbumsAdminPanel = () => {
                     onUpdated={handleUpdated}
                 />
             )}
-
         </div>
     );
 };

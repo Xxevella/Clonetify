@@ -7,18 +7,10 @@ import { resetTab } from "../../redux/slices/tabSlice.js";
 import handleLogout from "./handleLogout.js";
 import resetTabs from "./resetTabs.js";
 
-// Новый оверлей поиска
-const SearchOverlay = ({
-                           results,
-                           onClose,
-                           onTrackClick,
-                           isLoading,
-                           query
-                       }) => {
+const SearchOverlay = ({ results, onClose, onTrackClick, isLoading, query }) => {
     const overlayRef = useRef();
 
     useEffect(() => {
-        // Клик вне оверлея – закрыть
         function handleClickOutside(event) {
             if (overlayRef.current && !overlayRef.current.contains(event.target)) {
                 onClose();
@@ -51,7 +43,7 @@ const SearchOverlay = ({
                                     <div
                                         key={track.id}
                                         className="flex flex-col items-center bg-gray-800 rounded p-3 cursor-pointer hover:bg-gray-700 w-44"
-                                        onClick={() => {onTrackClick(track); onClose();}}
+                                        onClick={() => { onTrackClick(track); onClose(); }}
                                     >
                                         <img
                                             src={'../../../static/images/' + track.picture}
@@ -85,7 +77,6 @@ const Navbar = () => {
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
 
-    // Поисковое состояние
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [searchActive, setSearchActive] = useState(false);
@@ -93,7 +84,6 @@ const Navbar = () => {
 
     const toggleMenu = () => setMenuOpen(!menuOpen);
 
-    // Поиск треков
     const handleSearch = (query) => {
         const q = query.trim();
         setSearchQuery(q);
@@ -104,7 +94,6 @@ const Navbar = () => {
         }
         setIsLoading(true);
         setSearchActive(true);
-        // Запрос на сервер поиска
         fetch(`http://localhost:5000/trackRouter/search?query=${encodeURIComponent(q)}`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to search');
@@ -120,7 +109,6 @@ const Navbar = () => {
             });
     };
 
-    // Закрыть поиск
     const handleCloseSearch = () => {
         setSearchActive(false);
         setSearchQuery('');
@@ -128,10 +116,7 @@ const Navbar = () => {
         setIsLoading(false);
     };
 
-    // Воспроизвести трек при клике
     const handleTrackClick = (track) => {
-        // Можно вызвать кастомное событие для Main, или через глобал redux (setCurrentTrack)
-        // Для простоты: window.dispatchEvent + кастомное событие
         window.dispatchEvent(new CustomEvent('playTrackFromSearch', { detail: track }));
     };
 
@@ -142,7 +127,7 @@ const Navbar = () => {
                     <div className='cursor-pointer' onClick={() => resetTabs(dispatch, navigate)}>
                         <img src={assets.spotify_logo} alt='spotify logo' className='h-10' />
                     </div>
-                    <div style={{backgroundColor: '#2a2a2a'}} className='flex items-center justify-center ml-4 w-12 h-12 border-2 rounded-full'>
+                    <div style={{ backgroundColor: '#2a2a2a' }} className='flex items-center justify-center ml-4 w-12 h-12 border-2 rounded-full'>
                         <div className='flex items-center text-white cursor-pointer' onClick={() => resetTabs(dispatch, navigate)}>
                             <img src={assets.home_icon} alt='Home Icon' className='w-6 h-6' />
                         </div>
@@ -182,6 +167,9 @@ const Navbar = () => {
                             </div>
                             {menuOpen && (
                                 <div className="absolute right-0 bg-white text-black rounded shadow-md mt-2">
+                                    <Link to="/artist-panel" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setMenuOpen(false)}>
+                                        Artist Panel
+                                    </Link>
                                     <Link to="/profile" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setMenuOpen(false)}>
                                         Profile
                                     </Link>
@@ -205,7 +193,6 @@ const Navbar = () => {
                     )}
                 </div>
             </nav>
-            {/* ОВЕРЛЕЙ поиска */}
             {searchActive && (
                 <SearchOverlay
                     results={searchResults}

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Cookies from "js-cookie";
 import { setUser } from "../../redux/slices/userSlice.js";
 import { selectTab } from "../../redux/slices/tabSlice.js";
-import {setCurrentTrack, setTracks} from "../../redux/slices/tracksSlice.js";
+import { setCurrentTrack, setTracks } from "../../redux/slices/tracksSlice.js";
 import TrackPlayer from '../components/trackPlayer.jsx';
 import { assets } from "../assets/assets.js";
 
@@ -24,7 +24,6 @@ const Main = () => {
     const [volume, setVolume] = useState(50);
     const audioRef = React.useRef(new Audio());
     const [currentTime, setCurrentTime] = useState(0);
-
     const [favorites, setFavorites] = useState([]);
     const [playlists, setPlaylists] = useState([]);
 
@@ -40,8 +39,7 @@ const Main = () => {
     useEffect(() => {
         const storedUser = Cookies.get('auth');
         const storedVolume = Cookies.get('volume');
-        const storedTrack = Cookies.get('currentTrack');
-
+        const storedTrack = localStorage.getItem('currentTrack');
 
         if (storedUser) {
             const user = JSON.parse(storedUser);
@@ -57,9 +55,9 @@ const Main = () => {
 
         if (storedTrack) {
             const track = JSON.parse(storedTrack);
-            setCurrentTrack(track);
+            dispatch(setCurrentTrack(track));
             audioRef.current.src = `../../../static/audio/${track.audio}`;
-            setIsPlaying(false);
+            setIsPlaying(true);
         }
 
         setLoading(false);
@@ -118,7 +116,6 @@ const Main = () => {
         fetchPlaylists();
     }, [userId]);
 
-
     useEffect(() => {
         audioRef.current.addEventListener('timeupdate', handleTimeUpdate);
         return () => {
@@ -157,7 +154,7 @@ const Main = () => {
 
     const handleSeek = (time) => {
         audioRef.current.currentTime = time;
-        setCurrentTrack({ ...currentTrack, currentTime: time });
+        dispatch(setCurrentTrack({ ...currentTrack, currentTime: time }));
     };
 
     const handleAddToFavorites = async (track) => {
@@ -178,9 +175,6 @@ const Main = () => {
                 throw new Error(errorData.message || 'Failed to add track to favorites');
             }
 
-            const data = await response.json();
-            console.log(`Track ${track.title} added to favorites:`, data);
-
             fetchFavorites();
         } catch (error) {
             console.error('Error adding to favorites:', error);
@@ -189,7 +183,7 @@ const Main = () => {
 
     const handleAddToPlaylist = async (track, playlistId) => {
         try {
-            const response = await fetch('http://localhost:5000/playlistRouter/addTrack', { // предположим такой эндпоинт для добавления
+            const response = await fetch('http://localhost:5000/playlistRouter/addTrack', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -205,10 +199,6 @@ const Main = () => {
                 throw new Error(errorData.message || 'Failed to add track to playlist');
             }
 
-            const data = await response.json();
-            console.log(`Track ${track.title} added to playlist ${playlistId}:`, data);
-
-            // Обновляем playlists после добавления
             fetchPlaylists();
         } catch (error) {
             console.error('Error adding to playlist:', error);
@@ -230,7 +220,7 @@ const Main = () => {
         audioRef.current.onloadedmetadata = () => {
             const duration = audioRef.current.duration;
             dispatch(setCurrentTrack({ ...track, duration }));
-            Cookies.set('currentTrack', JSON.stringify({ ...track, duration }), { path: '/', expires: 7 });
+            localStorage.setItem('currentTrack', JSON.stringify({ ...track, duration })); // Сохраняем в localStorage
             audioRef.current.play();
             setIsPlaying(true);
         };
@@ -385,7 +375,6 @@ const Main = () => {
 
     return (
         <div className="h-screen bg-gradient-to-b from-gray-700 to-black flex">
-
             <div className="w-1/5 bg-black p-4 overflow-y-auto">
                 <h1 className="text-white text-2xl mb-4">Your Library</h1>
                 {user ? (

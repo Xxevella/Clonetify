@@ -13,9 +13,9 @@ const TrackPlayer = ({
                          volume,
                          onSeek,
                          isPlaying,
-                         playlists, // Pass playlists as a prop
-                         onAddToPlaylist, // Function to handle adding to a playlist
-                         onAddToFavorites, // Function to handle adding to favorites
+                         playlists,
+                         onAddToPlaylist,
+                         onAddToFavorites,
                      }) => {
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);
@@ -41,11 +41,10 @@ const TrackPlayer = ({
     };
 
     const handleAddToFavorites = () => {
-        onAddToFavorites(track); // Call the function to add to favorites
+        onAddToFavorites(track);
         setShowDropdown(false);
     };
 
-    // Закрываем dropdown при клике вне его
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -66,14 +65,14 @@ const TrackPlayer = ({
 
     return (
         <div className="track-player bg-gray-800 p-4 flex items-center justify-between fixed bottom-0 left-0 right-0">
-            <div className="flex items-center relative">
+            <div className="flex items-center">
                 <img
-                    src={track ? `../../../static/images/${track.picture}` : '../../../tracksPic/008345a8-f134-4f40-9f44-ef2af931da79.png'}
+                    src={track ? `../../../static/images/${track.picture}` : '../../../tracksPic/default.png'}
                     alt={track ? track.title : 'No track selected'}
                     className="w-16 h-16 rounded"
                 />
                 <div className="ml-4 flex items-center relative">
-                    <h2 className="text-white text-lg">{track.title}</h2>
+                    <h2 className="text-white text-lg truncate w-48">{track.title}</h2>
                     <img
                         src={assets.plus_icon}
                         alt="Add to Playlist"
@@ -85,9 +84,9 @@ const TrackPlayer = ({
                             ref={dropdownRef}
                             className="absolute bg-gray-700 rounded shadow-lg z-50"
                             style={{
-                                bottom: '100%',  // Располагаем сверху
+                                bottom: '100%',
                                 left: 0,
-                                marginBottom: '8px', // Отступ сверху плюса
+                                marginBottom: '8px',
                                 minWidth: '160px',
                             }}
                         >
@@ -110,7 +109,7 @@ const TrackPlayer = ({
                     )}
                 </div>
             </div>
-            <div className="flex flex-col items-center mx-4">
+            <div className="flex flex-col items-center mx-4 mr-45">
                 <div className="flex space-x-4 items-center">
                     <img src={assets.prev_icon} onClick={onPrevious} className="text-white w-4 h-4 cursor-pointer" />
                     {isPlaying ? (

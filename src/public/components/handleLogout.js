@@ -8,12 +8,14 @@ const handleLogout = async (dispatch, navigate) => {
     try {
         await signOut(auth);
         dispatch(logout());
-
         dispatch(clearCurrentTrack());
+
         const allCookies = Cookies.get();
         Object.keys(allCookies).forEach(cookieName => {
             Cookies.remove(cookieName, { path: '/' });
         });
+
+        localStorage.removeItem('currentTrack');
 
         alert("Вы успешно вышли из системы!");
         navigate('/');
