@@ -8,6 +8,8 @@ import playlistRouter from "./routes/playlistRoutes.js";
 import artistRouter from "./routes/artistRoutes.js";
 import albumRouter from "./routes/albumRoutes.js";
 import genreRouter from "./routes/genreRoutes.js";
+import searchRouter from "./routes/searchRoutes.js";
+import statisticsRouter from "./routes/statisticRoutes.js";
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -25,6 +27,8 @@ app.use('/playlistRouter', playlistRouter)
 app.use('/albumRouter', albumRouter);
 app.use('/artistRouter', artistRouter)
 app.use('/genreRouter', genreRouter);
+app.use('/searchRouter', searchRouter)
+app.use('/statistics', statisticsRouter);
 
 async function startApp() {
     try {

@@ -1,119 +1,52 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setSearchQuery, setSearchResults, setIsSearching, clearSearch } from '../../redux/slices/searchSlice.js';
 import { assets } from "../assets/assets.js";
 import { Link, useNavigate } from "react-router-dom";
-import SearchBar from "./SearchBar.jsx";
-import { useSelector, useDispatch } from 'react-redux';
-import { resetTab } from "../../redux/slices/tabSlice.js";
 import handleLogout from "./handleLogout.js";
 import resetTabs from "./resetTabs.js";
-
-const SearchOverlay = ({ results, onClose, onTrackClick, isLoading, query }) => {
-    const overlayRef = useRef();
-
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (overlayRef.current && !overlayRef.current.contains(event.target)) {
-                onClose();
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [onClose]);
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-80">
-            <div
-                ref={overlayRef}
-                className="relative mt-28 bg-gray-900 p-6 rounded-lg max-w-2xl w-full shadow-2xl overflow-y-auto max-h-[80vh]"
-            >
-                <button
-                    onClick={onClose}
-                    className="absolute top-2 right-2 text-gray-300 hover:text-white text-2xl"
-                    aria-label="Close"
-                >×</button>
-                <h2 className="text-white text-2xl mb-4">Search results for: <b>{query}</b></h2>
-                {isLoading ? (
-                    <div className="text-gray-300">Searching...</div>
-                ) : (
-                    results.length === 0
-                        ? <div className="text-gray-400">No tracks found.</div>
-                        : (
-                            <div className="flex flex-wrap gap-6">
-                                {results.map((track) => (
-                                    <div
-                                        key={track.id}
-                                        className="flex flex-col items-center bg-gray-800 rounded p-3 cursor-pointer hover:bg-gray-700 w-44"
-                                        onClick={() => { onTrackClick(track); onClose(); }}
-                                    >
-                                        <img
-                                            src={'../../../static/images/' + track.picture}
-                                            alt={track.title}
-                                            className="w-32 h-32 rounded mb-2 object-cover"
-                                        />
-                                        <h3 className="text-white text-base font-semibold">{track.title}</h3>
-                                        <div className="text-gray-400 text-xs text-center">
-                                            {track.Artists && track.Artists.length > 0
-                                                ? track.Artists.map((artist, idx) => (
-                                                    <span key={artist.id}>
-                                                        {artist.name}{idx < track.Artists.length - 1 ? ', ' : ''}
-                                                    </span>
-                                                ))
-                                                : 'Unknown Artist'}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )
-                )}
-            </div>
-        </div>
-    );
-};
+import SearchBar from "./SearchBar.jsx";
 
 const Navbar = () => {
     const dispatch = useDispatch();
-    const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
-    const user = useSelector((state) => state.user);
+    const isAuthenticated = useSelector(state => state.user.isAuthenticated);
+    const user = useSelector(state => state.user);
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-    const [searchActive, setSearchActive] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const searchQuery = useSelector(state => state.search.query);
+    const isSearching = useSelector(state => state.search.isSearching);
 
     const toggleMenu = () => setMenuOpen(!menuOpen);
 
     const handleSearch = (query) => {
         const q = query.trim();
-        setSearchQuery(q);
+        dispatch(setSearchQuery(q));
         if (!q) {
-            setSearchResults([]);
-            setSearchActive(false);
+            dispatch(clearSearch());
             return;
         }
-        setIsLoading(true);
-        setSearchActive(true);
-        fetch(`http://localhost:5000/trackRouter/search?query=${encodeURIComponent(q)}`)
+        dispatch(setIsSearching(true));
+
+        fetch(`http://localhost:5000/searchRouter/search?query=${encodeURIComponent(q)}`)
             .then(res => {
-                if (!res.ok) throw new Error('Failed to search');
+                if (!res.ok) throw new Error('Search request failed');
                 return res.json();
             })
             .then(data => {
-                setSearchResults(data);
-                setIsLoading(false);
+                // Ожидается, что data = { albums: [...], tracks: [...], artists: [...] }
+                dispatch(setSearchResults(data));
             })
-            .catch(err => {
-                setSearchResults([]);
-                setIsLoading(false);
+            .catch(() => {
+                dispatch(setSearchResults({ albums: [], tracks: [], artists: [] }));
+            })
+            .finally(() => {
+                dispatch(setIsSearching(false));
             });
     };
 
-    const handleCloseSearch = () => {
-        setSearchActive(false);
-        setSearchQuery('');
-        setSearchResults([]);
-        setIsLoading(false);
+    const handleClearSearch = () => {
+        dispatch(clearSearch());
     };
 
     const handleTrackClick = (track) => {
@@ -132,11 +65,9 @@ const Navbar = () => {
                             <img src={assets.home_icon} alt='Home Icon' className='w-6 h-6' />
                         </div>
                     </div>
-                    <SearchBar
-                        onSearch={handleSearch}
-                        onClear={handleCloseSearch}
-                    />
+                    <SearchBar onSearch={handleSearch} onClear={handleClearSearch} />
                 </div>
+
                 <div className='flex flex-row mr-35 items-center'>
                     {!isAuthenticated ? (
                         <>
@@ -167,16 +98,30 @@ const Navbar = () => {
                             </div>
                             {menuOpen && (
                                 <div className="absolute right-0 bg-white text-black rounded shadow-md mt-2">
-                                    <Link to="/artist-panel" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setMenuOpen(false)}>
-                                        Artist Panel
-                                    </Link>
+                                    {user.role === 'artist' && (
+                                        <>
+                                            <Link to="/artist-panel" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setMenuOpen(false)}>
+                                                Artist Panel
+                                            </Link>
+                                            <Link to="/artist-statistic" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setMenuOpen(false)}>
+                                                Statistics
+                                            </Link>
+                                        </>
+
+                                    )}
                                     <Link to="/profile" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setMenuOpen(false)}>
                                         Profile
                                     </Link>
                                     {user.role === 'admin' && (
-                                        <Link to="/admin-panel" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setMenuOpen(false)}>
-                                            Admin Panel
-                                        </Link>
+                                        <>
+                                            <Link to="/admin-panel" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setMenuOpen(false)}>
+                                                Admin Panel
+                                            </Link>
+                                            <Link to="/admin-statistic" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setMenuOpen(false)}>
+                                                Statistic
+                                            </Link>
+
+                                        </>
                                     )}
                                     <div
                                         className="block px-4 py-2 hover:bg-gray-200 cursor-pointer"
@@ -193,15 +138,6 @@ const Navbar = () => {
                     )}
                 </div>
             </nav>
-            {searchActive && (
-                <SearchOverlay
-                    results={searchResults}
-                    onClose={handleCloseSearch}
-                    onTrackClick={handleTrackClick}
-                    isLoading={isLoading}
-                    query={searchQuery}
-                />
-            )}
         </>
     );
 };

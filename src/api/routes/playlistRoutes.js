@@ -10,6 +10,7 @@ router.get('/playlists/:id', playlistController.getOne);
 router.post('/playlists', playlistController.create.bind(playlistController));
 router.delete('/playlists/:id', playlistController.delete.bind(playlistController));
 router.put('/playlists/:id', playlistController.update.bind(playlistController));
+router.delete('/playlists/:playlistId/tracks/:trackId', playlistController.removeTrackFromPlaylist.bind(playlistController));
 
 router.get('/user/:userId', playlistController.getPlaylistsByUserId.bind(playlistController));
 

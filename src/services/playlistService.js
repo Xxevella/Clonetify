@@ -119,6 +119,18 @@ class PlaylistService {
         return playlistId;
     }
 
+    async removeTrackFromPlaylist(playlistId, trackId) {
+        const result = await Playlist_tracks.destroy({
+            where: {
+                playlist_id: playlistId,
+                track_id: trackId
+            }
+        });
+
+        if (result === 0) {
+            throw new Error('Track not found in playlist');
+        }
+    }
 }
 
 export default new PlaylistService();

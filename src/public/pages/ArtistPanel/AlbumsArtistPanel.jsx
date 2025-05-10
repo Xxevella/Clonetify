@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import UpdateAlbumModal from "../../pages/AdminPanel/Albums/UpdateAlbumModal.jsx";
 import CreateAlbumModal from "../../pages/AdminPanel/Albums/CreateAlbumModal.jsx";
 
-const AlbumsAdminPanel = () => {
+const AlbumsArtistPanel = () => {
+    const loggedInArtistId = useSelector(state => state.user.id);
     const [editingAlbum, setEditingAlbum] = useState(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [albums, setAlbums] = useState([]);
@@ -29,8 +31,12 @@ const AlbumsAdminPanel = () => {
             if (!response.ok) throw new Error('Failed to fetch albums');
             const data = await response.json();
 
-            setAlbums(data || []);
-            setFilteredAlbums(data || []);
+            const artistAlbums = data.filter(album =>
+                album.Artists && album.Artists.some(artist => artist.User.id === loggedInArtistId)
+            );
+
+            setAlbums(artistAlbums);
+            setFilteredAlbums(artistAlbums);
         } catch (error) {
             console.error('Error fetching albums:', error);
             setError('Failed to fetch albums');
@@ -211,4 +217,4 @@ const AlbumsAdminPanel = () => {
     );
 };
 
-export default AlbumsAdminPanel;
+export default AlbumsArtistPanel;

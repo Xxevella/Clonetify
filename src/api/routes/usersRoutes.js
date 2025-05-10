@@ -8,7 +8,7 @@ const userController = new UserController(router);
 
 router.post('/users', userController.create);
 router.get('/users', userController.getAll);
-router.get('/users/:id', userController.getOne); // Проверяем авторизацию
+router.get('/users/:id', userController.getOne);
 router.put('/users', userController.update);
 router.delete('/users/:id', userController.delete);
 

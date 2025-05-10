@@ -14,7 +14,7 @@ router.post('/playlist', trackController.addToPlaylist);
 router.delete('/playlist', trackController.removeFromPlaylist);
 
 router.post('/favorites', trackController.addToFavorites);
-router.delete('/favorites', trackController.removeFromFavorites);
+router.delete('/favorites', trackController.removeFromFavorites.bind(trackController));
 
 router.get('/favorites/:userId', trackController.getFavorites.bind(trackController));
 

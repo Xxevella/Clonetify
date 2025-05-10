@@ -34,6 +34,16 @@ class ArtistController {
         }
     }
 
+    async getTracksByArtistId(req, res) {
+        try {
+            const { artistId } = req.params;
+            const tracks = await ArtistService.getTracksByArtistId(artistId);
+            res.json(tracks);
+        } catch (error) {
+            console.error('Error fetching artist tracks:', error);
+            res.status(500).json({ message: 'Failed to fetch tracks for artist' });
+        }
+    }
     async update(req, res) {
         try {
             const artist = req.body;

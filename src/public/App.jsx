@@ -10,6 +10,8 @@ import AddAdminPanel from "./pages/AddAdminPanel.jsx";
 import UpdateUserPanel from "./pages/UpdateUserPanel.jsx";
 import ArtistPanel from "./pages/ArtistPanel/ArtistPanel.jsx";
 import { useSelector } from 'react-redux';
+import AdminStatistic from "./pages/Statistic/AdminStatistic/AdminStatistic.jsx";
+import ArtistStatistics from "./pages/Statistic/ArtistStatistic/ArtistStatistics.jsx";
 
 function App() {
     const user = useSelector((state) => state.user);
@@ -38,6 +40,8 @@ function App() {
                 <Route path="/add-admin-panel" element={<AdminRoute element={<AddAdminPanel />} />} />
                 <Route path="/update-user/:id" element={<AdminRoute element={<UpdateUserPanel />} />} />
                 <Route path="/artist-panel" element={<ArtistRoute element={<ArtistPanel />} />} />
+                <Route path="/admin-statistic" element={<AdminRoute element={<AdminStatistic />} />} />
+                <Route path="/artist-statistic" element={<ArtistRoute element={<ArtistStatistics />} />} />
             </Routes>
         </Router>
     );

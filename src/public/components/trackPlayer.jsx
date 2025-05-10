@@ -39,7 +39,6 @@ const TrackPlayer = ({
         onAddToPlaylist(track, playlistId);
         setShowDropdown(false);
     };
-
     const handleAddToFavorites = () => {
         onAddToFavorites(track);
         setShowDropdown(false);

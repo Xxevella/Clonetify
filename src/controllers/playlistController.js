@@ -45,7 +45,7 @@ class PlaylistController{
     async getPlaylistsByUserId(req, res) {
         const { userId } = req.params;
         try {
-            const playlists = await PlaylistService.getAll(userId);
+            const playlists = await PlaylistService.getAllWithId(userId);
             return res.status(200).json(playlists);
         } catch (error) {
             console.error('Error fetching playlists:', error);
@@ -103,6 +103,20 @@ class PlaylistController{
         } catch (error) {
             console.error('Error deleting playlist:', error);
             res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
+    async removeTrackFromPlaylist(req, res) {
+        try {
+            const { playlistId, trackId } = req.params;
+            if (!playlistId || !trackId) {
+                return res.status(400).json({ message: 'Playlist ID and Track ID are required' });
+            }
+
+            await PlaylistService.removeTrackFromPlaylist(playlistId, trackId);
+            return res.status(200).json({ message: 'Track removed from playlist successfully' });
+        } catch (error) {
+            console.error('Error removing track from playlist:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
         }
     }
 

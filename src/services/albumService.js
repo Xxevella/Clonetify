@@ -3,7 +3,7 @@ import fileService from './fileService.js';
 import {Op} from "sequelize";
 import sequelize from "../api/sequelize.js";
 
-const { Album, Artist, Album_artists, Album_genres, Track, Genres } = models;
+const { Album, Artist, Album_artists, Album_genres, Track, Genres, User } = models;
 
 class AlbumService {
     async create(albumData, picture, artistIds, genreIds, trackIds) {
@@ -57,40 +57,25 @@ class AlbumService {
     }
 
     async getAll(options = {}) {
-        const { limit, offset, search, genre, artist, sort } = options;
-
-        const queryOptions = {
+        const albums = await Album.findAll({
             include: [
-                { model: Artist, through: { attributes: [] } },
+                {
+                    model: Artist,
+                    through: { attributes: [] },  // exclude join table attributes
+                    include: [  // nested include of User inside Artist
+                        {
+                            model: User,
+                            attributes: ['id', 'username'] // specify attributes you want from User
+                        }
+                    ]
+                },
                 { model: Genres, through: { attributes: [] } },
                 { model: Track }
             ],
-            where: {},
-            order: [['release_date', 'DESC']],
-            limit: limit ? parseInt(limit) : undefined,
-            offset: offset ? parseInt(offset) : undefined
-        };
+            ...options
+        });
 
-        if (search) {
-            queryOptions.where.title = {
-                [Op.iLike]: `%${search}%`
-            };
-        }
-
-        if (genre) {
-            queryOptions.include[1].where = { id: genre };
-        }
-
-        if (artist) {
-            queryOptions.include[0].where = { id: artist };
-        }
-
-        if (sort) {
-            const [field, order] = sort.split(':');
-            queryOptions.order = [[field, order.toUpperCase()]];
-        }
-
-        return await Album.findAndCountAll(queryOptions);
+        return albums;
     }
 
     async getById(id) {
@@ -108,7 +93,7 @@ class AlbumService {
                 },
                 {
                     model: Track,
-                    attributes: ['id', 'title', 'release_date'],
+                    attributes: ['id', 'title', 'release_date', 'picture', 'audio'],
                     include: [
                         {
                             model: Artist,

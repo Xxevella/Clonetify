@@ -2,7 +2,7 @@ import { models } from '../models/index.js';
 import fileService from './fileService.js';
 import Favorites from "../models/favorites.js";
 
-const { Track, Artist, Genres, Track_genres, Track_artists, Album } = models;
+const { Track, Artist, Genres, Track_genres, Track_artists, User, Album } = models;
 
 class TrackService {
     async create(trackData, picture, audio, artistIds, genreIds) {
@@ -55,6 +55,7 @@ class TrackService {
                         model: Track_artists,
                         attributes: []
                     },
+                    include: {model: User}
                 },
                 {
                     model: Genres,
@@ -173,7 +174,7 @@ class TrackService {
         // Finally, delete the track itself
         await track.destroy();
 
-        return id; // Return the ID of the deleted track
+        return id;
     }
 
     async addToPlaylist(trackId, playlistId) {
@@ -207,6 +208,10 @@ class TrackService {
     }
 
     async removeFromFavorites(trackId, userId) {
+        if (!trackId || !userId) {
+            throw new Error('Track ID and User ID are required');
+        }
+
         await models.Favorites.destroy({
             where: {
                 track_id: trackId,

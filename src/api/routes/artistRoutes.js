@@ -9,5 +9,6 @@ router.get('/artists/:id', artistController.getOne.bind(artistController));
 router.post('/artists', artistController.create.bind(artistController));
 router.delete('/artists/:id', artistController.delete.bind(artistController));
 router.put('/artists', artistController.update.bind(artistController));
+router.get('/:artistId/tracks', artistController.getTracksByArtistId);
 
 export default router;

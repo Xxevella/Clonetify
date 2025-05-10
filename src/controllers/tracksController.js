@@ -1,4 +1,5 @@
 import trackService from '../services/trackService.js';
+import TrackService from "../services/trackService.js";
 
 class TrackController {
     async create(req, res, next) {
@@ -125,8 +126,11 @@ class TrackController {
 
     async removeFromFavorites(req, res, next) {
         try {
-            const { trackId } = req.body;
-            const userId = req.user.id;
+            const { trackId, userId } = req.body;
+
+            if (!trackId || !userId) {
+                return res.status(400).json({ message: 'trackId and userId are required' });
+            }
 
             const result = await trackService.removeFromFavorites(trackId, userId);
             return res.json(result);

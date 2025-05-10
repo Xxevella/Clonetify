@@ -46,7 +46,8 @@ Genres.belongsToMany(Track, { through: Track_genres, foreignKey: 'genre_id' });
 Track.belongsTo(Album, { foreignKey: 'album_id' });
 Album.hasMany(Track, { foreignKey: 'album_id' });
 
-Artist.belongsTo(User, { foreignKey: 'user_id' }); // If artists can be users too
+Artist.belongsTo(User, { foreignKey: 'user_id' });
+User.hasMany(Artist, { foreignKey: 'user_id' });
 
 // Track to Album association
 Track.belongsTo(Album, { foreignKey: 'album_id' });

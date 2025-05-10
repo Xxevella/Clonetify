@@ -112,6 +112,21 @@ class AlbumController {
             });
         }
     }
+    async getTracksByAlbumId(req, res) {
+        try {
+            const { id } = req.params;
+            if (!id) return res.status(400).json({ message: 'Album ID required' });
+
+            // Получаем альбом с треками
+            const album = await albumService.getById(id);
+            if (!album) return res.status(404).json({ message: 'Album not found' });
+
+            return res.status(200).json(album.Tracks || []);
+        } catch (error) {
+            console.error('Error getting album tracks:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
 
     async delete(req, res) {
         try {

@@ -33,11 +33,31 @@ class ArtistService {
         return artist;
     }
 
+    async getTracksByArtistId(artistId) {
+        const tracks = await models.Track.findAll({
+            include: [{
+                model: models.Artist,
+                where: { id: artistId },
+                attributes: [],
+                through: { attributes: [] }
+            }],
+            order: [['title', 'ASC']],
+        });
+
+        return tracks;
+    }
+
     async update(artist) {
         const existingArtist = await Artist.findByPk(artist.id);
         if (!existingArtist) throw new Error("Artist not found");
         await existingArtist.update(artist);
         return existingArtist;
+    }
+
+    async getByUserId(userId) {
+        if (!userId) throw new Error("No userId provided");
+        const artist = await Artist.findOne({ where: { user_id: userId } });
+        return artist;
     }
 
     async delete(artistId) {

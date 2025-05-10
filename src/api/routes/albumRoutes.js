@@ -13,6 +13,7 @@ router.get('/albums/:id', albumController.getOne);
 router.post('/albums', albumController.create.bind(albumController));
 router.put('/albums/:id', albumController.update.bind(albumController));
 router.delete('/albums/:id', albumController.delete);
+router.get('/:id/tracks', albumController.getTracksByAlbumId.bind(albumController));
 
 router.post('/artist', albumController.addArtist);
 router.delete('/artist',  albumController.removeArtist);
