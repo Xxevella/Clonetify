@@ -34,13 +34,11 @@ class AlbumService {
             }
 
             if (trackIds?.length) {
-                // Сначала отвязываем все треки от альбома (если нужно)
                 await Track.update(
                     { album_id: null },
                     { where: { album_id: album.id }, transaction: t }
                 );
 
-                // Привязываем треки из списка к альбому
                 await Track.update(
                     { album_id: album.id },
                     { where: { id: trackIds }, transaction: t }
@@ -61,11 +59,11 @@ class AlbumService {
             include: [
                 {
                     model: Artist,
-                    through: { attributes: [] },  // exclude join table attributes
-                    include: [  // nested include of User inside Artist
+                    through: { attributes: [] },
+                    include: [
                         {
                             model: User,
-                            attributes: ['id', 'username'] // specify attributes you want from User
+                            attributes: ['id', 'username']
                         }
                     ]
                 },
@@ -118,17 +116,14 @@ class AlbumService {
                 throw new Error("Album not found");
             }
 
-            // Обработка изображения
             let fileName = album.picture;
             if (picture) {
-                // Удаляем старое изображение, если оно существует
                 if (album.picture) {
-                    await fileService.deleteFile(album.picture);
+                    await fileService.deleteImage(album.picture);
                 }
                 fileName = fileService.saveFile(picture);
             }
 
-            // Обновляем основные данные альбома
             await album.update(
                 {
                     ...albumData,
@@ -137,7 +132,6 @@ class AlbumService {
                 { transaction: t }
             );
 
-            // Обновляем связи с артистами
             if (artistIds) {
                 await Album_artists.destroy({
                     where: { album_id: id },
@@ -155,7 +149,6 @@ class AlbumService {
                 }
             }
 
-            // Обновляем связи с жанрами
             if (genreIds) {
                 await Album_genres.destroy({
                     where: { album_id: id },
@@ -173,7 +166,6 @@ class AlbumService {
                 }
             }
 
-            // Обновляем связи с треками
             if (trackIds) {
                 await Track.update(
                     { album_id: null },
@@ -196,7 +188,6 @@ class AlbumService {
 
             await t.commit();
 
-            // Возвращаем обновленный альбом со всеми связями
             return await this.getById(id);
         } catch (error) {
             await t.rollback();
@@ -211,7 +202,6 @@ class AlbumService {
             const album = await Album.findByPk(id);
             if (!album) throw new Error("Album not found");
 
-            // Remove all associations
             await Album_artists.destroy({
                 where: { album_id: id },
                 transaction: t
@@ -222,7 +212,6 @@ class AlbumService {
                 transaction: t
             });
 
-            // Update tracks to remove album association
             await Track.update(
                 { album_id: null },
                 {
@@ -231,12 +220,10 @@ class AlbumService {
                 }
             );
 
-            // Delete album picture if exists
             if (album.picture) {
-                await fileService.deleteFile(album.picture);
+                await fileService.deleteImage(album.picture);
             }
 
-            // Delete the album
             await album.destroy({ transaction: t });
 
             await t.commit();

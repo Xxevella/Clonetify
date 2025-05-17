@@ -51,7 +51,7 @@ class AlbumController {
             const { id } = req.params;
             if (!id) return res.status(400).json({ message: 'Album ID required' });
 
-            const album = await albumService.getOne(id);
+            const album = await albumService.getById(id);
             if (!album) return res.status(404).json({ message: 'Album not found' });
 
             return res.status(200).json(album);
@@ -68,19 +68,16 @@ class AlbumController {
                 return res.status(400).json({ message: 'Album ID required' });
             }
 
-            // Проверяем существование альбома
             const existingAlbum = await albumService.getById(id);
             if (!existingAlbum) {
                 return res.status(404).json({ message: 'Album not found' });
             }
 
-            // Получаем данные из FormData
             const albumData = {
                 title: req.body.title || existingAlbum.title,
                 release_date: req.body.release_date ? new Date(req.body.release_date) : existingAlbum.release_date
             };
 
-            // Парсим ID из JSON строк
             let artistIds = [], genreIds = [], trackIds = [];
 
             try {
@@ -92,7 +89,6 @@ class AlbumController {
                 return res.status(400).json({ message: 'Invalid ID format' });
             }
 
-            // Проверяем наличие файла
             const picture = req.files && req.files.picture ? req.files.picture : null;
 
             const updatedAlbum = await albumService.update(
@@ -117,7 +113,6 @@ class AlbumController {
             const { id } = req.params;
             if (!id) return res.status(400).json({ message: 'Album ID required' });
 
-            // Получаем альбом с треками
             const album = await albumService.getById(id);
             if (!album) return res.status(404).json({ message: 'Album not found' });
 

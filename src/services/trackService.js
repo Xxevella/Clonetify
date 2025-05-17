@@ -16,7 +16,6 @@ class TrackService {
                 audio: audioFileName,
             });
 
-            // Add entries to track_artists and track_genres
             if (artistIds && artistIds.length) {
                 const artistRecords = artistIds.map(artistId => ({
                     track_id: track.id,
@@ -36,7 +35,7 @@ class TrackService {
             return track;
         } catch (error) {
             console.error('Error creating track:', error);
-            throw error; // Ensure this does not call next
+            throw error;
         }
     }
 
@@ -107,7 +106,6 @@ class TrackService {
         let audioFileName = track.audio;
 
         if (picture) {
-            // Delete old picture file if it exists
             if (track.picture) {
                 fileService.deleteFile(track.picture, 'image');
             }
@@ -115,7 +113,6 @@ class TrackService {
         }
 
         if (audio) {
-            // Delete old audio file if it exists
             if (track.audio) {
                 fileService.deleteFile(track.audio, 'audio');
             }
@@ -159,11 +156,9 @@ class TrackService {
         const track = await Track.findByPk(id);
         if (!track) throw new Error("Track not found");
 
-        // Delete associated entries in track_artists and track_genres
         await Track_artists.destroy({ where: { track_id: id } });
         await Track_genres.destroy({ where: { track_id: id } });
 
-        // Optionally delete associated files
         if (track.picture) {
             fileService.deleteImage(track.picture);
         }
@@ -171,7 +166,6 @@ class TrackService {
             fileService.deleteAudio(track.audio);
         }
 
-        // Finally, delete the track itself
         await track.destroy();
 
         return id;

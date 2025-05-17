@@ -1,5 +1,4 @@
 import trackService from '../services/trackService.js';
-import TrackService from "../services/trackService.js";
 
 class TrackController {
     async create(req, res, next) {
@@ -9,8 +8,7 @@ class TrackController {
             const picture = files.picture;
             const audio = files.audio;
 
-            // Create track data object including album_id
-            const trackData = { title, releaseDate, album_id }; // Include album_id here
+            const trackData = { title, releaseDate, album_id };
             const track = await trackService.create(
                 trackData,
                 picture,

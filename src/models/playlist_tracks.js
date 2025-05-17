@@ -22,9 +22,9 @@ const Playlist_tracks = sequelize.define('Playlist_tracks', {
     }
 }, {
     tableName: 'playlist_tracks',
-    timestamps: true, // Включите временные метки
-    createdAt: false,  // Отключите createdAt
-    updatedAt: false,  // Отключите updatedAt
+    timestamps: true,
+    createdAt: false,
+    updatedAt: false,
 });
 
 export default Playlist_tracks;

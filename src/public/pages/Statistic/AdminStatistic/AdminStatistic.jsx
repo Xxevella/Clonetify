@@ -55,7 +55,6 @@ const Statistic = () => {
 
             <h1 className="text-5xl font-bold mb-12">Statistics Dashboard</h1>
 
-            {/* Основные метрики */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
                 <MetricCard title="Tracks" value={stats.tracksCount} color="bg-blue-600" />
                 <MetricCard title="Albums" value={stats.albumsCount} color="bg-green-600" />
@@ -63,7 +62,6 @@ const Statistic = () => {
                 <MetricCard title="Users" value={stats.usersCount} color="bg-purple-600" />
             </div>
 
-            {/* Графики */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <section className="bg-gray-800 rounded-lg p-6 shadow-lg">
                     <h2 className="text-2xl font-semibold mb-6">Popular Genres</h2>

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 const UpdateTrackModal = ({ track, onClose, onUpdated }) => {
     const [title, setTitle] = useState(track.title);
     const [releaseDate, setReleaseDate] = useState(track.releaseDate);
-    const [albumId, setAlbumId] = useState(track.album_id || ''); // Added albumId state
+    const [albumId, setAlbumId] = useState(track.album_id || '');
     const [picture, setPicture] = useState(null);
     const [audio, setAudio] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
@@ -55,7 +55,7 @@ const UpdateTrackModal = ({ track, onClose, onUpdated }) => {
             formData.append('releaseDate', releaseDate);
         }
         if (albumId) {
-            formData.append('album_id', albumId); // Include album_id
+            formData.append('album_id', albumId);
         }
         if (picture) {
             formData.append('picture', picture);

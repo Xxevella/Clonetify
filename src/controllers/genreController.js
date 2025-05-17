@@ -47,7 +47,7 @@ class GenreController {
         try {
             const { id } = req.params;
             await genreService.delete(id);
-            return res.status(204).send(); // No content
+            return res.status(204).send();
         } catch (error) {
             next(error);
         }

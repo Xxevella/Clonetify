@@ -12,7 +12,6 @@ class StatisticsService {
                 where: { role: { [Op.not]: 'admin' } }
             });
 
-            // Популярные жанры
             const popularGenresRaw = await sequelize.query(`
                 SELECT g.name, COUNT(tg.track_id) as count
                 FROM genres g
@@ -24,7 +23,6 @@ class StatisticsService {
 
             const currentYear = new Date().getFullYear();
 
-            // Регистрация пользователей по месяцам
             const userRegistrationsRaw = await User.findAll({
                 attributes: [
                     [sequelize.fn('to_char', sequelize.col('created_at'), 'Mon'), 'month'],
@@ -36,7 +34,6 @@ class StatisticsService {
                 raw: true
             });
 
-            // Выпуски треков по месяцам
             const trackReleasesRaw = await Track.findAll({
                 attributes: [
                     [sequelize.fn('to_char', sequelize.col('created_at'), 'Mon'), 'month'],
@@ -90,13 +87,10 @@ class StatisticsService {
 
         const currentYear = new Date().getFullYear();
 
-        // Подсчёт альбомов артиста через промежуточную таблицу Album_artists
         const albumsCountRaw = await Album_artists.count({
             where: { artist_id: artistId }
         });
 
-        // Подсчёт треков артиста через Track_artists (предполагается, что есть такая таблица)
-        // Если у вас треки связаны с артистом через Track_artists:
         const tracksCountRaw = await sequelize.query(`
       SELECT COUNT(DISTINCT t.id) as count
       FROM tracks t
@@ -108,7 +102,6 @@ class StatisticsService {
         });
         const tracksCount = tracksCountRaw[0]?.count || 0;
 
-        // Популярные жанры через треки артиста
         const genresRaw = await sequelize.query(`
             SELECT g.name, COUNT(tg.track_id) as count
             FROM genres g
@@ -127,7 +120,6 @@ class StatisticsService {
 
         const genresCount = popularGenres.length;
 
-        // Выпуски треков по месяцам (треки артиста)
         const monthlyReleasesRaw = await sequelize.query(`
             SELECT
                 to_char(t.created_at, 'Mon') AS month, 

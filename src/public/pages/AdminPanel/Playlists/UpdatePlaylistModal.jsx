@@ -26,7 +26,6 @@ const UpdatePlaylistModal = ({ playlist, onClose, onUpdated }) => {
         if (file && file.type === 'image/png') {
             setPicture(file);
 
-            // Создаем временный URL для превью и сохраняем в состояние
             const url = URL.createObjectURL(file);
             setPreviewUrl(url);
         } else {
@@ -37,7 +36,6 @@ const UpdatePlaylistModal = ({ playlist, onClose, onUpdated }) => {
         }
     };
 
-    // Освобождаем URL при размонтировании или смене файла
     useEffect(() => {
         return () => {
             if (previewUrl) {

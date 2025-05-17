@@ -21,7 +21,6 @@ class SearchService {
             attributes: ['id', 'name']
         };
 
-        // Ищем альбомы
         const albums = await Album.findAll({
             where: { title: likeQuery },
             include: [artistInclude],
@@ -29,7 +28,6 @@ class SearchService {
             order: [['title', 'ASC']],
         });
 
-        // Ищем треки
         const tracks = await Track.findAll({
             where: {
                 title: likeQuery
@@ -39,7 +37,6 @@ class SearchService {
             order: [['title', 'ASC']],
         });
 
-        // Ищем артистов
         const artists = await Artist.findAll({
             where: { name: likeQuery },
             attributes: ['id', 'name'],

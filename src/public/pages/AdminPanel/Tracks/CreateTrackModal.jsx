@@ -26,7 +26,7 @@ const CreateTrackModal = ({ onClose, onCreated }) => {
 
     const handleAudioChange = (e) => {
         const file = e.target.files[0];
-        if (file && file.type === 'audio/mpeg') { // MP3 files
+        if (file && file.type === 'audio/mpeg') {
             setAudio(file);
         } else {
             alert('Please select an MP3 file.');
@@ -66,7 +66,7 @@ const CreateTrackModal = ({ onClose, onCreated }) => {
         const formData = new FormData();
         formData.append('title', title.trim());
         if (releaseDate) {
-            formData.append('releaseDate', releaseDate); // Ensure correct key
+            formData.append('releaseDate', releaseDate);
         }
         if (picture) {
             formData.append('picture', picture);
@@ -74,10 +74,10 @@ const CreateTrackModal = ({ onClose, onCreated }) => {
         if (audio) {
             formData.append('audio', audio);
         }
-        formData.append('genre_ids', JSON.stringify(genreIdsArray)); // Ensure correct key
-        formData.append('artist_ids', JSON.stringify(artistIdsArray)); // Ensure correct key
+        formData.append('genre_ids', JSON.stringify(genreIdsArray));
+        formData.append('artist_ids', JSON.stringify(artistIdsArray));
         if (albumId) {
-            formData.append('album_id', albumId); // Correctly send album_id
+            formData.append('album_id', albumId);
         }
 
         try {

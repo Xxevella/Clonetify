@@ -38,7 +38,7 @@ const PlaylistsAdminPanel = () => {
     };
 
     const handleAddPlaylist = () => {
-        navigate('/add-playlist'); // Предполагается, что есть роут для добавления плейлиста
+        navigate('/add-playlist');
     };
 
     const handleDeletePlaylist = (id) => {

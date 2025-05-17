@@ -16,7 +16,7 @@ class UserService{
     }
 
     async getAllWithoutPagination() {
-        const allUsers = await User.findAll(); // Получаем всех пользователей без пагинации
+        const allUsers = await User.findAll();
         return allUsers;
     }
 

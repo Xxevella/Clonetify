@@ -33,15 +33,14 @@ const TracksArtistPanel = () => {
             if (!response.ok) throw new Error('Failed to fetch tracks');
             const data = await response.json();
 
-            console.log('Fetched tracks:', data); // Лог для проверки полученных треков
-            console.log('Logged-in artist ID:', loggedInArtistId); // Лог для проверки ID залогированного артиста
+            console.log('Fetched tracks:', data);
+            console.log('Logged-in artist ID:', loggedInArtistId);
 
-            // Фильтруем треки по ID залогированного пользователя
             const artistTracks = data.filter(track =>
                 track.Artists && track.Artists.some(artist => artist.User.id === loggedInArtistId)
             );
 
-            console.log('Filtered tracks:', artistTracks); // Лог для проверки отфильтрованных треков
+            console.log('Filtered tracks:', artistTracks);
 
             setTracks(artistTracks);
             setFilteredTracks(artistTracks);

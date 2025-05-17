@@ -239,7 +239,6 @@ const Main = () => {
             return otherTracks[randomIndex];
         }
 
-        // Для обычных плейлистов
         const playlist = playlists.find(pl => pl.name === selectedTab);
         if (!playlist || !playlist.Tracks || playlist.Tracks.length === 0) return null;
 
@@ -497,7 +496,6 @@ const Main = () => {
                                     className="relative flex flex-col items-center justify-between p-2 bg-gray-700 rounded mb-4 ml-6 cursor-pointer"
                                     onClick={() => playTrack(track)}
                                 >
-                                    {/* Крестик удаления из избранного */}
                                     <button
                                         onClick={e => {
                                             e.stopPropagation();
@@ -541,12 +539,11 @@ const Main = () => {
                                 <div
                                     key={track.id}
                                     className="relative flex flex-col items-center p-2 bg-gray-700 rounded mb-2 w-50 h-60 ml-10 cursor-pointer"
-                                    onClick={() => playTrack(track)} // воспроизведение трека
+                                    onClick={() => playTrack(track)}
                                 >
-                                    {/* Крестик удаления */}
                                     <button
                                         onClick={e => {
-                                            e.stopPropagation(); // ВАЖНО: предотвращаем срабатывание onClick контейнера
+                                            e.stopPropagation();
                                             handleRemoveTrackFromPlaylist(track.id, playlist.id);
                                         }}
                                         className="absolute top-1 right-1 text-white bg-red-600 rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700"

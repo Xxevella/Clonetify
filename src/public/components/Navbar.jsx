@@ -34,7 +34,6 @@ const Navbar = () => {
                 return res.json();
             })
             .then(data => {
-                // Ожидается, что data = { albums: [...], tracks: [...], artists: [...] }
                 dispatch(setSearchResults(data));
             })
             .catch(() => {

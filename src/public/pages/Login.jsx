@@ -19,7 +19,6 @@ const Login = () => {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // Запрос на твой backend за полными данными пользователя
             const res = await fetch(`http://localhost:5000/userRouter/users/${user.uid}`);
             if (!res.ok) throw new Error('Failed to fetch user data');
             const userDataFromServer = await res.json();

@@ -54,7 +54,6 @@ const UpdateAlbumModal = ({ album, onClose, onUpdated }) => {
         }
 
         try {
-            // Подготовка данных
             const genreIdsArray = genres ? genres.split(',').map(id => parseInt(id.trim())) : [];
             const artistIdsArray = artistIds ? artistIds.split(',').map(id => parseInt(id.trim())) : [];
             const trackIdsArray = trackIds ? trackIds.split(',').map(id => parseInt(id.trim())) : [];

@@ -45,7 +45,6 @@ const ArtistStatistics = () => {
 
     return (
         <div className="p-8 bg-gray-900 min-h-screen text-white font-sans relative">
-            {/* Кнопка возврата */}
             <button
                 onClick={() => navigate('/')}
                 className="absolute top-4 right-4 bg-blue-600 hover:bg-blue-700 transition text-white py-2 px-4 rounded shadow"
@@ -56,7 +55,6 @@ const ArtistStatistics = () => {
 
             <h1 className="text-5xl font-bold mb-8 text-center">Моя Статистика</h1>
 
-            {/* Переключатель статистики */}
             <div className="flex justify-center gap-8 mb-12">
                 <button
                     onClick={() => setSelectedStat('overview')}
@@ -84,7 +82,6 @@ const ArtistStatistics = () => {
                 </button>
             </div>
 
-            {/* Общая статистика */}
             {selectedStat === 'overview' && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 max-w-4xl mx-auto">
                     <MetricCard title="Альбомы" value={stats.albumsCount} color="bg-green-600" />
@@ -93,7 +90,6 @@ const ArtistStatistics = () => {
                 </div>
             )}
 
-            {/* Популярные жанры */}
             {selectedStat === 'popularGenres' && (
                 <section className="bg-gray-800 rounded-lg p-6 shadow-lg max-w-4xl mx-auto">
                     <h2 className="text-2xl font-semibold mb-6 text-center">Популярные жанры</h2>
@@ -124,7 +120,6 @@ const ArtistStatistics = () => {
                 </section>
             )}
 
-            {/* Выпуски треков по месяцам */}
             {selectedStat === 'monthlyReleases' && (
                 <section className="bg-gray-800 rounded-lg p-6 shadow-lg max-w-4xl mx-auto">
                     <h2 className="text-2xl font-semibold mb-6 text-center">Выпуски треков по месяцам</h2>
